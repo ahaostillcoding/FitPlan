@@ -12,6 +12,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.fitplan.app.ui.common.FitPlanScaffold
 import com.fitplan.app.ui.common.rememberAppContainer
+import com.fitplan.app.ui.ai.AiPlanScreen
+import com.fitplan.app.ui.ai.AiPlanViewModel
 import com.fitplan.app.ui.editPlan.EditPlanScreen
 import com.fitplan.app.ui.editPlan.EditPlanViewModel
 import com.fitplan.app.ui.history.HistoryScreen
@@ -20,7 +22,6 @@ import com.fitplan.app.ui.history.RecordDetailScreen
 import com.fitplan.app.ui.history.RecordDetailViewModel
 import com.fitplan.app.ui.home.HomeScreen
 import com.fitplan.app.ui.home.HomeViewModel
-import com.fitplan.app.ui.placeholder.AiPlaceholderScreen
 import com.fitplan.app.ui.planDetail.PlanDetailScreen
 import com.fitplan.app.ui.planDetail.PlanDetailViewModel
 import com.fitplan.app.ui.plans.PlansScreen
@@ -89,7 +90,16 @@ fun FitPlanNavHost(modifier: Modifier = Modifier) {
                 )
             }
             composable(FitPlanRoutes.AI) {
-                AiPlaceholderScreen()
+                val aiPlanViewModel: AiPlanViewModel = viewModel(
+                    factory = AiPlanViewModel.factory(
+                        appContainer.aiPlanRepository,
+                        appContainer.workoutPlanRepository
+                    )
+                )
+                AiPlanScreen(
+                    viewModel = aiPlanViewModel,
+                    onSaved = { navController.navigate(FitPlanRoutes.planDetail(it)) }
+                )
             }
             composable(FitPlanRoutes.SETTINGS) {
                 val settingsViewModel: SettingsViewModel = viewModel(
