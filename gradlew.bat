@@ -2,7 +2,7 @@
 setlocal
 
 set APP_HOME=%~dp0
-set GRADLE_VERSION=9.4.1
+set GRADLE_VERSION=8.14.3
 set GRADLE_CACHE=%USERPROFILE%\.gradle\wrapper\dists\fitplan-gradle-%GRADLE_VERSION%
 set GRADLE_EXE=%GRADLE_CACHE%\gradle-%GRADLE_VERSION%\bin\gradle.bat
 
