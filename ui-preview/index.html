@@ -401,7 +401,7 @@
           <p>增肌 · 每周 4 次 · 60 分钟</p>
           <span class="tag">当前计划</span>
           <div class="button-row" style="margin-top: 14px;">
-            <button data-go="detail">查看</button>
+            <button data-testid="primary-plan-detail" data-go="detail">查看</button>
             <button class="secondary" data-go="edit">编辑</button>
             <button class="secondary">复制</button>
             <button class="danger">删除</button>
@@ -411,7 +411,7 @@
           <h3>新手入门全身计划</h3>
           <p>新手入门 · 每周 3 次 · 45 分钟</p>
           <div class="button-row" style="margin-top: 14px;">
-            <button data-go="detail">查看</button>
+            <button data-testid="secondary-plan-detail" data-go="detail">查看</button>
             <button class="secondary">设为当前</button>
           </div>
         </article>
@@ -429,7 +429,7 @@
         <article class="card">
           <div class="list-title">
             <h3>Day 1 胸肩三头</h3>
-            <button data-go="workout">开始</button>
+            <button data-testid="start-day-workout" data-go="workout">开始</button>
           </div>
           <div class="divider"></div>
           <p><strong>杠铃卧推</strong><br>胸 · 4 组 · 8-10 次 · 自选重量 · 休息 90s</p>
@@ -493,7 +493,7 @@
           </div>
         </article>
         <label>本次训练备注<textarea placeholder="整体状态、疼痛、调整..."></textarea></label>
-        <button style="width: 100%;" data-go="record-detail">完成训练</button>
+        <button data-testid="finish-workout" style="width: 100%;" data-go="record-detail">完成训练</button>
       </section>
 
       <section class="screen" id="history">
@@ -592,4 +592,3 @@
   </script>
 </body>
 </html>
-
