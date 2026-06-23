@@ -29,11 +29,12 @@ fun RecordDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsState()
-    when (state) {
+    val currentState = state
+    when (currentState) {
         UiState.Loading -> LoadingState(modifier)
-        is UiState.Empty -> EmptyState((state as UiState.Empty).message, "返回", onBack, modifier)
-        is UiState.Error -> ErrorState((state as UiState.Error).message, modifier)
-        is UiState.Content -> RecordDetailContent((state as UiState.Content<WorkoutRecord>).data, modifier)
+        is UiState.Empty -> EmptyState(currentState.message, "返回", onBack, modifier)
+        is UiState.Error -> ErrorState(currentState.message, modifier)
+        is UiState.Content -> RecordDetailContent(currentState.data, modifier)
     }
 }
 
@@ -71,4 +72,3 @@ private fun RecordDetailContent(
         }
     }
 }
-
