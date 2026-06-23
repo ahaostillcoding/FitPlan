@@ -29,4 +29,3 @@ object FitPlanRoutes {
     fun workout(planId: Long, dayId: Long) = "workout/$planId/$dayId"
     fun recordDetail(recordId: Long) = "recordDetail/$recordId"
 }
-

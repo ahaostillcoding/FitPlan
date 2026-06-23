@@ -21,11 +21,12 @@ import com.fitplan.app.ui.history.RecordDetailViewModel
 import com.fitplan.app.ui.home.HomeScreen
 import com.fitplan.app.ui.home.HomeViewModel
 import com.fitplan.app.ui.placeholder.AiPlaceholderScreen
-import com.fitplan.app.ui.placeholder.SettingsPlaceholderScreen
 import com.fitplan.app.ui.planDetail.PlanDetailScreen
 import com.fitplan.app.ui.planDetail.PlanDetailViewModel
 import com.fitplan.app.ui.plans.PlansScreen
 import com.fitplan.app.ui.plans.PlansViewModel
+import com.fitplan.app.ui.settings.SettingsScreen
+import com.fitplan.app.ui.settings.SettingsViewModel
 import com.fitplan.app.ui.workout.WorkoutSessionScreen
 import com.fitplan.app.ui.workout.WorkoutSessionViewModel
 
@@ -91,7 +92,10 @@ fun FitPlanNavHost(modifier: Modifier = Modifier) {
                 AiPlaceholderScreen()
             }
             composable(FitPlanRoutes.SETTINGS) {
-                SettingsPlaceholderScreen()
+                val settingsViewModel: SettingsViewModel = viewModel(
+                    factory = SettingsViewModel.factory(appContainer.settingsRepository)
+                )
+                SettingsScreen(viewModel = settingsViewModel)
             }
             composable(
                 route = FitPlanRoutes.PLAN_DETAIL,
