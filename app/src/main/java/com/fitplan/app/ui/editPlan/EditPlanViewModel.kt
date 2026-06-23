@@ -103,7 +103,7 @@ class EditPlanViewModel(
         }
     }
 
-    fun updateExercise(dayIndex: Int, exerciseIndex: Int, updater: (ExerciseForm) -> ExerciseForm) {
+    fun updateExercise(dayIndex: Int, exerciseIndex: Int, updater: ExerciseForm.() -> ExerciseForm) {
         updateState {
             copy(days = days.mapIndexed { i, day ->
                 if (i != dayIndex) {
@@ -111,7 +111,7 @@ class EditPlanViewModel(
                 } else {
                     day.copy(
                         exercises = day.exercises.mapIndexed { j, exercise ->
-                            if (j == exerciseIndex) updater(exercise) else exercise
+                            if (j == exerciseIndex) exercise.updater() else exercise
                         }
                     )
                 }
@@ -257,4 +257,3 @@ class EditPlanViewModel(
         }
     }
 }
-
