@@ -3,6 +3,8 @@ package com.fitplan.app.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.fitplan.app.data.repository.BackupPreview
+import com.fitplan.app.data.repository.BackupRepository
 import com.fitplan.app.data.repository.DEFAULT_DEEPSEEK_MODEL
 import com.fitplan.app.data.repository.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,11 @@ data class SettingsUiState(
     val showApiKey: Boolean = false,
     val isSaving: Boolean = false,
     val message: String? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val exportJson: String = "",
+    val importJson: String = "",
+    val importPreview: BackupPreview? = null,
+    val isBackupBusy: Boolean = false
 ) {
     val hasApiKey: Boolean = apiKey.isNotBlank()
     val apiKeyStatus: String = if (hasApiKey) {
@@ -27,7 +33,8 @@ data class SettingsUiState(
 }
 
 class SettingsViewModel(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val backupRepository: BackupRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState
@@ -109,12 +116,95 @@ class SettingsViewModel(
         _uiState.update { it.copy(message = null, errorMessage = null) }
     }
 
+    fun exportBackup() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isBackupBusy = true, message = null, errorMessage = null) }
+            backupRepository.exportBackupJson()
+                .onSuccess { json ->
+                    _uiState.update {
+                        it.copy(
+                            isBackupBusy = false,
+                            exportJson = json,
+                            message = "备份 JSON 已生成"
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            isBackupBusy = false,
+                            errorMessage = throwable.message ?: "导出备份失败"
+                        )
+                    }
+                }
+        }
+    }
+
+    fun updateImportJson(value: String) {
+        _uiState.update {
+            it.copy(
+                importJson = value,
+                importPreview = null,
+                message = null,
+                errorMessage = null
+            )
+        }
+    }
+
+    fun previewImport() {
+        backupRepository.previewImport(_uiState.value.importJson)
+            .onSuccess { preview ->
+                _uiState.update {
+                    it.copy(
+                        importPreview = preview,
+                        message = "已读取备份：${preview.planCount} 个计划，${preview.recordCount} 条记录",
+                        errorMessage = null
+                    )
+                }
+            }
+            .onFailure { throwable ->
+                _uiState.update {
+                    it.copy(
+                        importPreview = null,
+                        errorMessage = throwable.message ?: "备份预览失败"
+                    )
+                }
+            }
+    }
+
+    fun importBackup() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isBackupBusy = true, message = null, errorMessage = null) }
+            backupRepository.importBackupJson(_uiState.value.importJson)
+                .onSuccess { preview ->
+                    _uiState.update {
+                        it.copy(
+                            isBackupBusy = false,
+                            importPreview = preview,
+                            message = "导入完成：${preview.planCount} 个计划，${preview.recordCount} 条记录"
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            isBackupBusy = false,
+                            errorMessage = throwable.message ?: "导入备份失败"
+                        )
+                    }
+                }
+        }
+    }
+
     companion object {
-        fun factory(settingsRepository: SettingsRepository): ViewModelProvider.Factory =
+        fun factory(
+            settingsRepository: SettingsRepository,
+            backupRepository: BackupRepository
+        ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return SettingsViewModel(settingsRepository) as T
+                    return SettingsViewModel(settingsRepository, backupRepository) as T
                 }
             }
     }

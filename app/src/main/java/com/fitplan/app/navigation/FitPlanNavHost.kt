@@ -104,7 +104,10 @@ fun FitPlanNavHost(modifier: Modifier = Modifier) {
             }
             composable(FitPlanRoutes.SETTINGS) {
                 val settingsViewModel: SettingsViewModel = viewModel(
-                    factory = SettingsViewModel.factory(appContainer.settingsRepository)
+                    factory = SettingsViewModel.factory(
+                        appContainer.settingsRepository,
+                        appContainer.backupRepository
+                    )
                 )
                 SettingsScreen(viewModel = settingsViewModel)
             }

@@ -1,6 +1,8 @@
 package com.fitplan.app.ui.settings
 
 import com.fitplan.app.data.repository.AppSettings
+import com.fitplan.app.data.repository.BackupPreview
+import com.fitplan.app.data.repository.BackupRepository
 import com.fitplan.app.data.repository.DEFAULT_DEEPSEEK_MODEL
 import com.fitplan.app.data.repository.SettingsRepository
 import com.fitplan.app.ui.MainDispatcherRule
@@ -23,7 +25,7 @@ class SettingsViewModelTest {
     @Test
     fun save_persistsApiKeyAndModel() = runTest {
         val repository = FakeSettingsRepository()
-        val viewModel = SettingsViewModel(repository)
+        val viewModel = SettingsViewModel(repository, FakeBackupRepository())
 
         viewModel.updateApiKey(" sk-test ")
         viewModel.updateModel("deepseek-v4-flash")
@@ -39,7 +41,7 @@ class SettingsViewModelTest {
     @Test
     fun clearApiKey_removesSavedKey() = runTest {
         val repository = FakeSettingsRepository(apiKey = "sk-test")
-        val viewModel = SettingsViewModel(repository)
+        val viewModel = SettingsViewModel(repository, FakeBackupRepository())
         advanceUntilIdle()
 
         viewModel.clearApiKey()
@@ -52,13 +54,41 @@ class SettingsViewModelTest {
 
     @Test
     fun emptyApiKey_reportsOfflineFeaturesStillAvailable() = runTest {
-        val viewModel = SettingsViewModel(FakeSettingsRepository())
+        val viewModel = SettingsViewModel(FakeSettingsRepository(), FakeBackupRepository())
         advanceUntilIdle()
 
         assertEquals(
             "未配置 API Key，AI 生成暂不可用；离线计划和记录不受影响。",
             viewModel.uiState.value.apiKeyStatus
         )
+    }
+
+    @Test
+    fun exportBackup_setsJsonAndMessage() = runTest {
+        val viewModel = SettingsViewModel(
+            FakeSettingsRepository(),
+            FakeBackupRepository(exportJson = """{"version":1}""")
+        )
+
+        viewModel.exportBackup()
+        advanceUntilIdle()
+
+        assertEquals("""{"version":1}""", viewModel.uiState.value.exportJson)
+        assertEquals("备份 JSON 已生成", viewModel.uiState.value.message)
+    }
+
+    @Test
+    fun previewImport_setsPreview() = runTest {
+        val viewModel = SettingsViewModel(
+            FakeSettingsRepository(),
+            FakeBackupRepository(preview = BackupPreview(planCount = 2, recordCount = 3))
+        )
+
+        viewModel.updateImportJson("""{"version":1}""")
+        viewModel.previewImport()
+
+        assertEquals(2, viewModel.uiState.value.importPreview?.planCount)
+        assertEquals(3, viewModel.uiState.value.importPreview?.recordCount)
     }
 
     private class FakeSettingsRepository(
@@ -91,5 +121,14 @@ class SettingsViewModelTest {
         override suspend fun saveSelectedWorkoutDayId(dayId: Long?) {
             state.value = state.value.copy(selectedWorkoutDayId = dayId)
         }
+    }
+
+    private class FakeBackupRepository(
+        private val exportJson: String = "{}",
+        private val preview: BackupPreview = BackupPreview(0, 0)
+    ) : BackupRepository {
+        override suspend fun exportBackupJson(): Result<String> = Result.success(exportJson)
+        override fun previewImport(json: String): Result<BackupPreview> = Result.success(preview)
+        override suspend fun importBackupJson(json: String): Result<BackupPreview> = Result.success(preview)
     }
 }

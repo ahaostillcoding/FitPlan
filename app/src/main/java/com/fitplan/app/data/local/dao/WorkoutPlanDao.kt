@@ -26,6 +26,10 @@ abstract class WorkoutPlanDao {
     abstract suspend fun getPlanWithDays(planId: Long): WorkoutPlanWithDays?
 
     @Transaction
+    @Query("SELECT * FROM workout_plans ORDER BY updatedAt DESC")
+    abstract suspend fun getAllPlansWithDays(): List<WorkoutPlanWithDays>
+
+    @Transaction
     @Query("SELECT * FROM workout_plans WHERE isActive = 1 ORDER BY updatedAt DESC LIMIT 1")
     abstract fun observeActivePlanWithDays(): Flow<WorkoutPlanWithDays?>
 
@@ -62,4 +66,3 @@ abstract class WorkoutPlanDao {
         activatePlan(planId, updatedAt)
     }
 }
-

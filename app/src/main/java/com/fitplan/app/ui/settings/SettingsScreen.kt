@@ -38,6 +38,10 @@ fun SettingsScreen(
         onToggleApiKeyVisibility = viewModel::toggleApiKeyVisibility,
         onSave = viewModel::save,
         onClearApiKey = viewModel::clearApiKey,
+        onExportBackup = viewModel::exportBackup,
+        onImportJsonChange = viewModel::updateImportJson,
+        onPreviewImport = viewModel::previewImport,
+        onImportBackup = viewModel::importBackup,
         modifier = modifier
     )
 }
@@ -50,6 +54,10 @@ private fun SettingsContent(
     onToggleApiKeyVisibility: () -> Unit,
     onSave: () -> Unit,
     onClearApiKey: () -> Unit,
+    onExportBackup: () -> Unit,
+    onImportJsonChange: (String) -> Unit,
+    onPreviewImport: () -> Unit,
+    onImportBackup: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -130,6 +138,66 @@ private fun SettingsContent(
                 }
             }
         }
+
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text("本地备份", style = MaterialTheme.typography.titleLarge)
+                Text(
+                    "导出会生成 JSON 文本；导入会先预览，并作为新计划/新记录写入，不覆盖现有数据。",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Button(
+                    onClick = onExportBackup,
+                    enabled = !state.isBackupBusy,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (state.isBackupBusy) "处理中..." else "生成备份 JSON")
+                }
+                if (state.exportJson.isNotBlank()) {
+                    OutlinedTextField(
+                        value = state.exportJson,
+                        onValueChange = {},
+                        label = { Text("导出的备份 JSON") },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 4,
+                        readOnly = true
+                    )
+                }
+                OutlinedTextField(
+                    value = state.importJson,
+                    onValueChange = onImportJsonChange,
+                    label = { Text("粘贴备份 JSON") },
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 4
+                )
+                state.importPreview?.let { preview ->
+                    Text(
+                        "预览：${preview.planCount} 个计划，${preview.recordCount} 条记录",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = onPreviewImport,
+                        enabled = !state.isBackupBusy,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("预览导入")
+                    }
+                    Button(
+                        onClick = onImportBackup,
+                        enabled = !state.isBackupBusy && state.importPreview != null,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("确认导入")
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -145,6 +213,10 @@ private fun SettingsContentPreview() {
         onModelChange = {},
         onToggleApiKeyVisibility = {},
         onSave = {},
-        onClearApiKey = {}
+        onClearApiKey = {},
+        onExportBackup = {},
+        onImportJsonChange = {},
+        onPreviewImport = {},
+        onImportBackup = {}
     )
 }

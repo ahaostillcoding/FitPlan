@@ -23,6 +23,10 @@ interface WorkoutRecordDao {
     @Query("SELECT * FROM workout_records WHERE id = :recordId LIMIT 1")
     suspend fun getRecordWithExercises(recordId: Long): WorkoutRecordWithExercises?
 
+    @Transaction
+    @Query("SELECT * FROM workout_records ORDER BY date DESC, id DESC")
+    suspend fun getAllRecordsWithExercises(): List<WorkoutRecordWithExercises>
+
     @Query("SELECT * FROM workout_records WHERE date >= :startMillis AND date < :endMillis ORDER BY date DESC, id DESC")
     fun observeRecordsBetween(startMillis: Long, endMillis: Long): Flow<List<WorkoutRecordEntity>>
 
@@ -41,4 +45,3 @@ interface WorkoutRecordDao {
     @Query("DELETE FROM workout_records WHERE id = :recordId")
     suspend fun deleteRecordById(recordId: Long)
 }
-

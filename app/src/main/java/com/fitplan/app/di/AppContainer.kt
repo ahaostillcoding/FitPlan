@@ -4,8 +4,10 @@ import android.content.Context
 import com.fitplan.app.data.local.database.FitPlanDatabase
 import com.fitplan.app.data.remote.deepseek.DeepSeekApiService
 import com.fitplan.app.data.repository.AiPlanRepository
+import com.fitplan.app.data.repository.BackupRepository
 import com.fitplan.app.data.repository.DataStoreSettingsRepository
 import com.fitplan.app.data.repository.DefaultAiPlanRepository
+import com.fitplan.app.data.repository.DefaultBackupRepository
 import com.fitplan.app.data.repository.DefaultWorkoutPlanRepository
 import com.fitplan.app.data.repository.DefaultWorkoutRecordRepository
 import com.fitplan.app.data.repository.SettingsRepository
@@ -23,6 +25,11 @@ class AppContainer(
     val settingsRepository: SettingsRepository = DataStoreSettingsRepository(appContext)
     val workoutPlanRepository: WorkoutPlanRepository = DefaultWorkoutPlanRepository(database)
     val workoutRecordRepository: WorkoutRecordRepository = DefaultWorkoutRecordRepository(database)
+    val backupRepository: BackupRepository = DefaultBackupRepository(
+        database = database,
+        workoutPlanRepository = workoutPlanRepository,
+        workoutRecordRepository = workoutRecordRepository
+    )
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(
             HttpLoggingInterceptor().apply {
