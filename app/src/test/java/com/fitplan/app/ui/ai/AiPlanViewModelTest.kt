@@ -84,6 +84,7 @@ class AiPlanViewModelTest {
         private val result: Result<WorkoutPlan>
     ) : AiPlanRepository {
         override suspend fun generatePlan(input: AiPlanInput): Result<WorkoutPlan> = result
+        override suspend fun testConnection(): Result<Unit> = Result.success(Unit)
         override fun parseWorkoutPlanJson(json: String): Result<WorkoutPlan> = result
     }
 

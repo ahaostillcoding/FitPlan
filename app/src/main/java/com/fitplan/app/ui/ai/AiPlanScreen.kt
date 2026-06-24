@@ -182,11 +182,11 @@ private fun AiInputCard(
                     )
                     Text("生成中...")
                 } else {
-                    Text("生成计划")
+                    Text(if (state.preview == null) "生成计划" else "重新生成计划")
                 }
             }
             Text(
-                "生成前请先在设置页保存 DeepSeek API Key。AI 计划只会进入预览，不会自动覆盖现有计划；手动计划和历史记录可离线使用。",
+                "生成前请先在设置页保存 DeepSeek API Key。AI 计划只会进入预览，不会自动覆盖已有计划；手动计划和历史记录可离线使用。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

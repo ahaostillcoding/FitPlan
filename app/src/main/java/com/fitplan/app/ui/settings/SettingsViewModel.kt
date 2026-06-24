@@ -3,6 +3,7 @@ package com.fitplan.app.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.fitplan.app.data.repository.AiPlanRepository
 import com.fitplan.app.data.repository.BackupPreview
 import com.fitplan.app.data.repository.BackupRepository
 import com.fitplan.app.data.repository.DEFAULT_DEEPSEEK_MODEL
@@ -17,6 +18,7 @@ data class SettingsUiState(
     val model: String = DEFAULT_DEEPSEEK_MODEL,
     val showApiKey: Boolean = false,
     val isSaving: Boolean = false,
+    val isTestingConnection: Boolean = false,
     val message: String? = null,
     val errorMessage: String? = null,
     val exportJson: String = "",
@@ -34,7 +36,8 @@ data class SettingsUiState(
 
 class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
-    private val backupRepository: BackupRepository
+    private val backupRepository: BackupRepository,
+    private val aiPlanRepository: AiPlanRepository? = null
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState
@@ -109,6 +112,34 @@ class SettingsViewModel(
                     )
                 }
             }
+        }
+    }
+
+    fun testDeepSeekConnection() {
+        val repository = aiPlanRepository
+        if (repository == null) {
+            _uiState.update { it.copy(errorMessage = "当前环境未配置 AI 服务") }
+            return
+        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isTestingConnection = true, message = null, errorMessage = null) }
+            repository.testConnection()
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            isTestingConnection = false,
+                            message = "DeepSeek 连接测试成功"
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    _uiState.update {
+                        it.copy(
+                            isTestingConnection = false,
+                            errorMessage = throwable.message ?: "DeepSeek 连接测试失败，请检查 Key、模型和网络"
+                        )
+                    }
+                }
         }
     }
 
@@ -199,12 +230,17 @@ class SettingsViewModel(
     companion object {
         fun factory(
             settingsRepository: SettingsRepository,
-            backupRepository: BackupRepository
+            backupRepository: BackupRepository,
+            aiPlanRepository: AiPlanRepository
         ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return SettingsViewModel(settingsRepository, backupRepository) as T
+                    return SettingsViewModel(
+                        settingsRepository,
+                        backupRepository,
+                        aiPlanRepository
+                    ) as T
                 }
             }
     }

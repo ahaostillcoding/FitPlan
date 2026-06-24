@@ -106,7 +106,8 @@ fun FitPlanNavHost(modifier: Modifier = Modifier) {
                 val settingsViewModel: SettingsViewModel = viewModel(
                     factory = SettingsViewModel.factory(
                         appContainer.settingsRepository,
-                        appContainer.backupRepository
+                        appContainer.backupRepository,
+                        appContainer.aiPlanRepository
                     )
                 )
                 SettingsScreen(viewModel = settingsViewModel)
@@ -158,7 +159,8 @@ fun FitPlanNavHost(modifier: Modifier = Modifier) {
                         planId,
                         dayId,
                         appContainer.workoutPlanRepository,
-                        appContainer.workoutRecordRepository
+                        appContainer.workoutRecordRepository,
+                        appContainer.settingsRepository
                     )
                 )
                 WorkoutSessionScreen(

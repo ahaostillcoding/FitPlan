@@ -3,16 +3,22 @@ package com.fitplan.app.ui.workout
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.fitplan.app.data.repository.SettingsRepository
 import com.fitplan.app.data.repository.WorkoutPlanRepository
 import com.fitplan.app.data.repository.WorkoutRecordRepository
 import com.fitplan.app.domain.model.WorkoutDay
 import com.fitplan.app.domain.model.WorkoutPlan
 import com.fitplan.app.domain.model.WorkoutRecord
 import com.fitplan.app.domain.model.WorkoutRecordExercise
+import com.google.gson.Gson
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
@@ -30,6 +36,9 @@ data class WorkoutSessionUiState(
     val startedAt: Long = System.currentTimeMillis(),
     val sessionNotes: String = "",
     val exerciseProgress: Map<Long, WorkoutExerciseProgress> = emptyMap(),
+    val restoredFromDraft: Boolean = false,
+    val activeRestExerciseId: Long? = null,
+    val restSecondsRemaining: Int = 0,
     val errorMessage: String? = null,
     val finishedRecordId: Long? = null
 )
@@ -38,8 +47,12 @@ class WorkoutSessionViewModel(
     private val planId: Long,
     private val dayId: Long,
     private val planRepository: WorkoutPlanRepository,
-    private val recordRepository: WorkoutRecordRepository
+    private val recordRepository: WorkoutRecordRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
+    private val gson = Gson()
+    private var restTimerJob: Job? = null
+
     private val _uiState = MutableStateFlow(WorkoutSessionUiState())
     val uiState: StateFlow<WorkoutSessionUiState> = _uiState.asStateFlow()
 
@@ -57,6 +70,37 @@ class WorkoutSessionViewModel(
 
     fun updateSessionNotes(notes: String) {
         _uiState.update { it.copy(sessionNotes = notes) }
+        persistDraft()
+    }
+
+    fun startRestTimer(exerciseId: Long, seconds: Int) {
+        restTimerJob?.cancel()
+        if (seconds <= 0) {
+            stopRestTimer()
+            return
+        }
+        _uiState.update {
+            it.copy(activeRestExerciseId = exerciseId, restSecondsRemaining = seconds)
+        }
+        restTimerJob = viewModelScope.launch {
+            while (isActive && _uiState.value.restSecondsRemaining > 0) {
+                delay(1000)
+                _uiState.update { state ->
+                    val next = (state.restSecondsRemaining - 1).coerceAtLeast(0)
+                    state.copy(
+                        restSecondsRemaining = next,
+                        activeRestExerciseId = if (next == 0) null else state.activeRestExerciseId
+                    )
+                }
+            }
+        }
+    }
+
+    fun stopRestTimer() {
+        restTimerJob?.cancel()
+        _uiState.update {
+            it.copy(activeRestExerciseId = null, restSecondsRemaining = 0)
+        }
     }
 
     fun finishWorkout() {
@@ -64,7 +108,7 @@ class WorkoutSessionViewModel(
         val plan = state.plan
         val day = state.day
         if (plan == null || day == null) {
-            _uiState.update { it.copy(errorMessage = "训练内容未加载完成") }
+            _uiState.update { it.copy(errorMessage = "训练内容还没有加载完成") }
             return
         }
 
@@ -98,8 +142,16 @@ class WorkoutSessionViewModel(
                 }
             )
             recordRepository.saveRecord(record)
-                .onSuccess { recordId -> _uiState.update { it.copy(isSaving = false, finishedRecordId = recordId) } }
-                .onFailure { error -> _uiState.update { it.copy(isSaving = false, errorMessage = error.message ?: "保存训练记录失败") } }
+                .onSuccess { recordId ->
+                    settingsRepository.clearWorkoutDraft()
+                    stopRestTimer()
+                    _uiState.update { it.copy(isSaving = false, finishedRecordId = recordId) }
+                }
+                .onFailure { error ->
+                    _uiState.update {
+                        it.copy(isSaving = false, errorMessage = error.message ?: "保存训练记录失败")
+                    }
+                }
         }
     }
 
@@ -110,22 +162,42 @@ class WorkoutSessionViewModel(
                     val selectedDay = plan?.days?.firstOrNull { it.id == dayId }
                         ?: plan?.days?.firstOrNull()
                     if (plan == null || selectedDay == null) {
-                        _uiState.update { it.copy(isLoading = false, errorMessage = "未找到训练内容") }
+                        _uiState.update { it.copy(isLoading = false, errorMessage = "没有找到可训练的内容") }
                     } else {
+                        val draft = readMatchingDraft(selectedDay.id)
+                        val defaultProgress = selectedDay.exercises.associate { exercise ->
+                            exercise.id to WorkoutExerciseProgress(exercise.id)
+                        }
+                        val restoredProgress = draft?.progress
+                            ?.filter { progress -> selectedDay.exercises.any { it.id == progress.exerciseId } }
+                            ?.associateBy { it.exerciseId }
+                            .orEmpty()
                         _uiState.value = WorkoutSessionUiState(
                             isLoading = false,
                             plan = plan,
                             day = selectedDay,
-                            exerciseProgress = selectedDay.exercises.associate { exercise ->
-                                exercise.id to WorkoutExerciseProgress(exercise.id)
-                            }
+                            startedAt = draft?.startedAt ?: System.currentTimeMillis(),
+                            sessionNotes = draft?.sessionNotes.orEmpty(),
+                            exerciseProgress = defaultProgress + restoredProgress,
+                            restoredFromDraft = draft != null
                         )
                     }
                 }
                 .onFailure { error ->
-                    _uiState.update { it.copy(isLoading = false, errorMessage = error.message ?: "加载训练失败") }
+                    _uiState.update {
+                        it.copy(isLoading = false, errorMessage = error.message ?: "加载训练失败")
+                    }
                 }
         }
+    }
+
+    private suspend fun readMatchingDraft(selectedDayId: Long): WorkoutSessionDraft? {
+        val json = settingsRepository.settings.first().workoutDraftJson
+        if (json.isBlank()) return null
+        return runCatching {
+            gson.fromJson(json, WorkoutSessionDraft::class.java)
+        }.getOrNull()
+            ?.takeIf { draft -> draft.planId == planId && draft.dayId == selectedDayId }
     }
 
     private fun updateProgress(
@@ -136,18 +208,55 @@ class WorkoutSessionViewModel(
             val current = state.exerciseProgress[exerciseId] ?: WorkoutExerciseProgress(exerciseId)
             state.copy(exerciseProgress = state.exerciseProgress + (exerciseId to current.reducer()))
         }
+        persistDraft()
     }
+
+    private fun persistDraft() {
+        val state = _uiState.value
+        val plan = state.plan ?: return
+        val day = state.day ?: return
+        val draft = WorkoutSessionDraft(
+            planId = plan.id,
+            dayId = day.id,
+            startedAt = state.startedAt,
+            sessionNotes = state.sessionNotes,
+            progress = state.exerciseProgress.values.toList()
+        )
+        viewModelScope.launch {
+            settingsRepository.saveWorkoutDraftJson(gson.toJson(draft))
+        }
+    }
+
+    override fun onCleared() {
+        restTimerJob?.cancel()
+        super.onCleared()
+    }
+
+    private data class WorkoutSessionDraft(
+        val planId: Long,
+        val dayId: Long,
+        val startedAt: Long,
+        val sessionNotes: String,
+        val progress: List<WorkoutExerciseProgress>
+    )
 
     companion object {
         fun factory(
             planId: Long,
             dayId: Long,
             planRepository: WorkoutPlanRepository,
-            recordRepository: WorkoutRecordRepository
+            recordRepository: WorkoutRecordRepository,
+            settingsRepository: SettingsRepository
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return WorkoutSessionViewModel(planId, dayId, planRepository, recordRepository) as T
+                return WorkoutSessionViewModel(
+                    planId,
+                    dayId,
+                    planRepository,
+                    recordRepository,
+                    settingsRepository
+                ) as T
             }
         }
     }

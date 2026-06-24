@@ -54,6 +54,37 @@ class AiPlanRepositoryTest {
     }
 
     @Test
+    fun testConnection_withoutApiKey_returnsFailure() = runTest {
+        val repository = DefaultAiPlanRepository(
+            apiService = FakeDeepSeekApiService { _, _ -> error("Should not call network") },
+            settingsRepository = FakeSettingsRepository(apiKey = ""),
+            ioDispatcher = StandardTestDispatcher(testScheduler)
+        )
+
+        val result = repository.testConnection()
+
+        assertTrue(result.isFailure)
+        assertEquals("请先保存 DeepSeek API Key", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun testConnection_withContent_returnsSuccess() = runTest {
+        val repository = DefaultAiPlanRepository(
+            apiService = FakeDeepSeekApiService { _, _ ->
+                DeepSeekChatResponse(
+                    choices = listOf(DeepSeekChoice(DeepSeekResponseMessage("""{"ok":true}""")))
+                )
+            },
+            settingsRepository = FakeSettingsRepository(apiKey = "sk-test"),
+            ioDispatcher = StandardTestDispatcher(testScheduler)
+        )
+
+        val result = repository.testConnection()
+
+        assertTrue(result.isSuccess)
+    }
+
+    @Test
     fun parseWorkoutPlanJson_validJson_returnsPlan() {
         val repository = DefaultAiPlanRepository(
             apiService = FakeDeepSeekApiService { _, _ -> error("Unused") },
@@ -130,6 +161,14 @@ class AiPlanRepositoryTest {
 
         override suspend fun saveSelectedWorkoutDayId(dayId: Long?) {
             state.value = state.value.copy(selectedWorkoutDayId = dayId)
+        }
+
+        override suspend fun saveWorkoutDraftJson(json: String) {
+            state.value = state.value.copy(workoutDraftJson = json)
+        }
+
+        override suspend fun clearWorkoutDraft() {
+            state.value = state.value.copy(workoutDraftJson = "")
         }
     }
 

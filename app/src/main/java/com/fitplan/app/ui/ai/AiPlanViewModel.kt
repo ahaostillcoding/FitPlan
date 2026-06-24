@@ -72,8 +72,7 @@ class AiPlanViewModel(
     fun updateNotes(value: String) = updateState { copy(notes = value, errorMessage = null, message = null) }
 
     fun generatePlan() {
-        val state = uiState.value
-        val input = state.toInputOrError()
+        val input = uiState.value.toInputOrError()
         if (input.isFailure) {
             updateState { copy(errorMessage = input.exceptionOrNull()?.message ?: "请输入有效信息") }
             return

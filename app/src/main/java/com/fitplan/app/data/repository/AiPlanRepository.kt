@@ -25,6 +25,7 @@ data class AiPlanInput(
 
 interface AiPlanRepository {
     suspend fun generatePlan(input: AiPlanInput): Result<WorkoutPlan>
+    suspend fun testConnection(): Result<Unit>
     fun parseWorkoutPlanJson(json: String): Result<WorkoutPlan>
 }
 
@@ -50,7 +51,7 @@ class DefaultAiPlanRepository(
                         messages = listOf(
                             DeepSeekMessage(
                                 role = "system",
-                                content = "你是一名专业健身教练，只返回合法 json，不要输出 Markdown。"
+                                content = "你是一名专业健身教练。必须只返回合法 json，不要输出 Markdown。"
                             ),
                             DeepSeekMessage(
                                 role = "user",
@@ -62,6 +63,36 @@ class DefaultAiPlanRepository(
                 val content = response.choices.firstOrNull()?.message?.content
                     ?: throw IllegalStateException("DeepSeek 没有返回计划内容")
                 parseWorkoutPlanJson(content).getOrThrow()
+            }
+        }
+    }
+
+    override suspend fun testConnection(): Result<Unit> {
+        return withContext(ioDispatcher) {
+            runCatching {
+                val settings = settingsRepository.settings.first()
+                val apiKey = settings.deepSeekApiKey.trim()
+                if (apiKey.isBlank()) {
+                    throw IllegalStateException("请先保存 DeepSeek API Key")
+                }
+                val response = apiService.createChatCompletion(
+                    authorization = "Bearer $apiKey",
+                    request = DeepSeekChatRequest(
+                        model = settings.deepSeekModel.ifBlank { DEFAULT_DEEPSEEK_MODEL },
+                        messages = listOf(
+                            DeepSeekMessage(
+                                role = "user",
+                                content = "请只返回 json：{\"ok\":true}"
+                            )
+                        ),
+                        maxTokens = 32,
+                        temperature = 0.0
+                    )
+                )
+                val content = response.choices.firstOrNull()?.message?.content.orEmpty()
+                if (content.isBlank()) {
+                    throw IllegalStateException("DeepSeek 连接成功但返回为空")
+                }
             }
         }
     }

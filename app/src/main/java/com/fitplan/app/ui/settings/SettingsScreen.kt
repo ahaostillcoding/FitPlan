@@ -38,6 +38,7 @@ fun SettingsScreen(
         onToggleApiKeyVisibility = viewModel::toggleApiKeyVisibility,
         onSave = viewModel::save,
         onClearApiKey = viewModel::clearApiKey,
+        onTestConnection = viewModel::testDeepSeekConnection,
         onExportBackup = viewModel::exportBackup,
         onImportJsonChange = viewModel::updateImportJson,
         onPreviewImport = viewModel::previewImport,
@@ -54,6 +55,7 @@ private fun SettingsContent(
     onToggleApiKeyVisibility: () -> Unit,
     onSave: () -> Unit,
     onClearApiKey: () -> Unit,
+    onTestConnection: () -> Unit,
     onExportBackup: () -> Unit,
     onImportJsonChange: (String) -> Unit,
     onPreviewImport: () -> Unit,
@@ -136,6 +138,13 @@ private fun SettingsContent(
                         Text("清空 Key")
                     }
                 }
+                OutlinedButton(
+                    onClick = onTestConnection,
+                    enabled = state.hasApiKey && !state.isTestingConnection,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (state.isTestingConnection) "测试中..." else "测试 DeepSeek 连接")
+                }
             }
         }
 
@@ -214,6 +223,7 @@ private fun SettingsContentPreview() {
         onToggleApiKeyVisibility = {},
         onSave = {},
         onClearApiKey = {},
+        onTestConnection = {},
         onExportBackup = {},
         onImportJsonChange = {},
         onPreviewImport = {},

@@ -1,10 +1,13 @@
 package com.fitplan.app.ui.settings
 
+import com.fitplan.app.data.repository.AiPlanInput
+import com.fitplan.app.data.repository.AiPlanRepository
 import com.fitplan.app.data.repository.AppSettings
 import com.fitplan.app.data.repository.BackupPreview
 import com.fitplan.app.data.repository.BackupRepository
 import com.fitplan.app.data.repository.DEFAULT_DEEPSEEK_MODEL
 import com.fitplan.app.data.repository.SettingsRepository
+import com.fitplan.app.domain.model.WorkoutPlan
 import com.fitplan.app.ui.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -64,6 +67,36 @@ class SettingsViewModelTest {
     }
 
     @Test
+    fun testDeepSeekConnection_success_setsMessage() = runTest {
+        val viewModel = SettingsViewModel(
+            FakeSettingsRepository(apiKey = "sk-test"),
+            FakeBackupRepository(),
+            FakeAiPlanRepository(Result.success(Unit))
+        )
+
+        viewModel.testDeepSeekConnection()
+        advanceUntilIdle()
+
+        assertEquals("DeepSeek 连接测试成功", viewModel.uiState.value.message)
+        assertFalse(viewModel.uiState.value.isTestingConnection)
+    }
+
+    @Test
+    fun testDeepSeekConnection_failure_setsError() = runTest {
+        val viewModel = SettingsViewModel(
+            FakeSettingsRepository(apiKey = "sk-test"),
+            FakeBackupRepository(),
+            FakeAiPlanRepository(Result.failure(IllegalStateException("无效 Key")))
+        )
+
+        viewModel.testDeepSeekConnection()
+        advanceUntilIdle()
+
+        assertEquals("无效 Key", viewModel.uiState.value.errorMessage)
+        assertFalse(viewModel.uiState.value.isTestingConnection)
+    }
+
+    @Test
     fun exportBackup_setsJsonAndMessage() = runTest {
         val viewModel = SettingsViewModel(
             FakeSettingsRepository(),
@@ -120,6 +153,27 @@ class SettingsViewModelTest {
 
         override suspend fun saveSelectedWorkoutDayId(dayId: Long?) {
             state.value = state.value.copy(selectedWorkoutDayId = dayId)
+        }
+
+        override suspend fun saveWorkoutDraftJson(json: String) {
+            state.value = state.value.copy(workoutDraftJson = json)
+        }
+
+        override suspend fun clearWorkoutDraft() {
+            state.value = state.value.copy(workoutDraftJson = "")
+        }
+    }
+
+    private class FakeAiPlanRepository(
+        private val connectionResult: Result<Unit>
+    ) : AiPlanRepository {
+        override suspend fun generatePlan(input: AiPlanInput): Result<WorkoutPlan> {
+            return Result.failure(UnsupportedOperationException("Unused"))
+        }
+
+        override suspend fun testConnection(): Result<Unit> = connectionResult
+        override fun parseWorkoutPlanJson(json: String): Result<WorkoutPlan> {
+            return Result.failure(UnsupportedOperationException("Unused"))
         }
     }
 
