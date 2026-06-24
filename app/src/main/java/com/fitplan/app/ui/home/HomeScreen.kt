@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -41,6 +42,7 @@ fun HomeScreen(
     HomeContent(
         state = state,
         onStartWorkout = onStartWorkout,
+        onSelectWorkoutDay = viewModel::selectWorkoutDay,
         onNewPlan = onNewPlan,
         onAiPlan = onAiPlan,
         onHistory = onHistory,
@@ -52,6 +54,7 @@ fun HomeScreen(
 fun HomeContent(
     state: HomeUiState,
     onStartWorkout: (Long, Long) -> Unit,
+    onSelectWorkoutDay: (Long) -> Unit,
     onNewPlan: () -> Unit,
     onAiPlan: () -> Unit,
     onHistory: () -> Unit,
@@ -68,7 +71,7 @@ fun HomeContent(
         return
     }
 
-    val todayDay = plan.days.firstOrNull()
+    val todayDay = state.todayDay
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -93,6 +96,17 @@ fun HomeContent(
                             "今日默认：${todayDay.dayName}",
                             style = MaterialTheme.typography.titleMedium
                         )
+                        if (plan.days.size > 1) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                plan.days.forEach { day ->
+                                    FilterChip(
+                                        selected = day.id == todayDay.id,
+                                        onClick = { onSelectWorkoutDay(day.id) },
+                                        label = { Text(day.dayName) }
+                                    )
+                                }
+                            }
+                        }
                     } else {
                         Text(
                             "当前计划还没有训练日，请先编辑计划。",
@@ -166,6 +180,7 @@ private fun HomeContentPreview() {
                 weeklyWorkoutCount = 2
             ),
             onStartWorkout = { _, _ -> },
+            onSelectWorkoutDay = {},
             onNewPlan = {},
             onAiPlan = {},
             onHistory = {}

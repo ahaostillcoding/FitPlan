@@ -79,6 +79,19 @@ class EditPlanViewModel(
         }
     }
 
+    fun moveDayUp(index: Int) {
+        if (index <= 0) return
+        updateState {
+            copy(days = days.swap(index, index - 1), errorMessage = null)
+        }
+    }
+
+    fun moveDayDown(index: Int) {
+        updateState {
+            if (index >= days.lastIndex) this else copy(days = days.swap(index, index + 1), errorMessage = null)
+        }
+    }
+
     fun updateDayName(index: Int, value: String) {
         updateState {
             copy(days = days.mapIndexed { i, day -> if (i == index) day.copy(dayName = value) else day }, errorMessage = null)
@@ -102,6 +115,31 @@ class EditPlanViewModel(
                     day
                 } else {
                     day.copy(exercises = day.exercises.filterIndexed { j, _ -> j != exerciseIndex })
+                }
+            }, errorMessage = null)
+        }
+    }
+
+    fun moveExerciseUp(dayIndex: Int, exerciseIndex: Int) {
+        if (exerciseIndex <= 0) return
+        updateState {
+            copy(days = days.mapIndexed { i, day ->
+                if (i == dayIndex) {
+                    day.copy(exercises = day.exercises.swap(exerciseIndex, exerciseIndex - 1))
+                } else {
+                    day
+                }
+            }, errorMessage = null)
+        }
+    }
+
+    fun moveExerciseDown(dayIndex: Int, exerciseIndex: Int) {
+        updateState {
+            copy(days = days.mapIndexed { i, day ->
+                if (i == dayIndex && exerciseIndex < day.exercises.lastIndex) {
+                    day.copy(exercises = day.exercises.swap(exerciseIndex, exerciseIndex + 1))
+                } else {
+                    day
                 }
             }, errorMessage = null)
         }
@@ -256,6 +294,14 @@ class EditPlanViewModel(
 
     private fun updateState(reducer: EditPlanUiState.() -> EditPlanUiState) {
         _uiState.update { current -> current.reducer() }
+    }
+
+    private fun <T> List<T>.swap(from: Int, to: Int): List<T> {
+        return toMutableList().also { list ->
+            val item = list[from]
+            list[from] = list[to]
+            list[to] = item
+        }
     }
 
     companion object {

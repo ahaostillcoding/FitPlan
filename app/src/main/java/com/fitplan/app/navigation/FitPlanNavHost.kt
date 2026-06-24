@@ -58,7 +58,8 @@ fun FitPlanNavHost(modifier: Modifier = Modifier) {
                 val homeViewModel: HomeViewModel = viewModel(
                     factory = HomeViewModel.factory(
                         appContainer.workoutPlanRepository,
-                        appContainer.workoutRecordRepository
+                        appContainer.workoutRecordRepository,
+                        appContainer.settingsRepository
                     )
                 )
                 HomeScreen(

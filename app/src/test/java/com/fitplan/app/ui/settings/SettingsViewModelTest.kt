@@ -87,5 +87,9 @@ class SettingsViewModelTest {
         override suspend fun clearDeepSeekApiKey() {
             state.value = state.value.copy(deepSeekApiKey = "")
         }
+
+        override suspend fun saveSelectedWorkoutDayId(dayId: Long?) {
+            state.value = state.value.copy(selectedWorkoutDayId = dayId)
+        }
     }
 }

@@ -157,7 +157,11 @@ private fun WorkoutDayFormCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("训练日 ${dayIndex + 1}", style = MaterialTheme.typography.titleLarge)
-                OutlinedButton(onClick = { viewModel.removeDay(dayIndex) }) { Text("删除") }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = { viewModel.moveDayUp(dayIndex) }) { Text("上移") }
+                    OutlinedButton(onClick = { viewModel.moveDayDown(dayIndex) }) { Text("下移") }
+                    OutlinedButton(onClick = { viewModel.removeDay(dayIndex) }) { Text("删除") }
+                }
             }
             OutlinedTextField(
                 value = day.dayName,
@@ -195,7 +199,11 @@ private fun ExerciseFormFields(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text("动作 ${exerciseIndex + 1}", style = MaterialTheme.typography.titleMedium)
-            OutlinedButton(onClick = { viewModel.removeExercise(dayIndex, exerciseIndex) }) { Text("删除") }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(onClick = { viewModel.moveExerciseUp(dayIndex, exerciseIndex) }) { Text("上移") }
+                OutlinedButton(onClick = { viewModel.moveExerciseDown(dayIndex, exerciseIndex) }) { Text("下移") }
+                OutlinedButton(onClick = { viewModel.removeExercise(dayIndex, exerciseIndex) }) { Text("删除") }
+            }
         }
         OutlinedTextField(
             value = exercise.name,
