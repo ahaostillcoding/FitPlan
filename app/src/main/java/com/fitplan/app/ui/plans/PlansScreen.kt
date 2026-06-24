@@ -8,14 +8,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.fitplan.app.domain.model.WorkoutPlan
@@ -33,6 +39,17 @@ fun PlansScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsState()
+    val message by viewModel.message.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val pendingDeletePlan = remember { mutableStateOf<WorkoutPlan?>(null) }
+
+    LaunchedEffect(message) {
+        message?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearMessage()
+        }
+    }
+
     PlansContent(
         state = state,
         onNewPlan = onNewPlan,
@@ -40,9 +57,33 @@ fun PlansScreen(
         onEditPlan = onEditPlan,
         onSetActive = viewModel::setActive,
         onDuplicate = viewModel::duplicate,
-        onDelete = viewModel::delete,
+        onDeleteRequest = { pendingDeletePlan.value = it },
+        snackbarHostState = snackbarHostState,
         modifier = modifier
     )
+
+    pendingDeletePlan.value?.let { plan ->
+        AlertDialog(
+            onDismissRequest = { pendingDeletePlan.value = null },
+            title = { Text("删除计划？") },
+            text = { Text("将删除「${plan.name}」及其中的训练日和动作。此操作无法撤销。") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.delete(plan.id)
+                        pendingDeletePlan.value = null
+                    }
+                ) {
+                    Text("确认删除")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { pendingDeletePlan.value = null }) {
+                    Text("取消")
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -53,37 +94,45 @@ fun PlansContent(
     onEditPlan: (Long) -> Unit,
     onSetActive: (Long) -> Unit,
     onDuplicate: (Long) -> Unit,
-    onDelete: (Long) -> Unit,
+    onDeleteRequest: (WorkoutPlan) -> Unit,
+    snackbarHostState: SnackbarHostState? = null,
     modifier: Modifier = Modifier
 ) {
     when (state) {
         UiState.Loading -> LoadingState(modifier)
         is UiState.Error -> ErrorState(state.message, modifier)
         is UiState.Empty -> EmptyState(state.message, "新建计划", onNewPlan, modifier)
-        is UiState.Content -> LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+        is UiState.Content -> {
+            androidx.compose.foundation.layout.Box(modifier = modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("训练计划", style = MaterialTheme.typography.headlineMedium)
-                    Button(onClick = onNewPlan) { Text("新建") }
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("训练计划", style = MaterialTheme.typography.headlineMedium)
+                            Button(onClick = onNewPlan) { Text("新建") }
+                        }
+                    }
+                    items(state.data) { plan ->
+                        PlanCard(
+                            plan = plan,
+                            onClick = { onPlanClick(plan.id) },
+                            onEdit = { onEditPlan(plan.id) },
+                            onSetActive = { onSetActive(plan.id) },
+                            onDuplicate = { onDuplicate(plan.id) },
+                            onDelete = { onDeleteRequest(plan) }
+                        )
+                    }
                 }
-            }
-            items(state.data) { plan ->
-                PlanCard(
-                    plan = plan,
-                    onClick = { onPlanClick(plan.id) },
-                    onEdit = { onEditPlan(plan.id) },
-                    onSetActive = { onSetActive(plan.id) },
-                    onDuplicate = { onDuplicate(plan.id) },
-                    onDelete = { onDelete(plan.id) }
-                )
+                if (snackbarHostState != null) {
+                    SnackbarHost(hostState = snackbarHostState)
+                }
             }
         }
     }

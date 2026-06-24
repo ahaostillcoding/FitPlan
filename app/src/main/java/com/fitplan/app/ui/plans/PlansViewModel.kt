@@ -18,6 +18,7 @@ class PlansViewModel(
     private val repository: WorkoutPlanRepository
 ) : ViewModel() {
     private val errorMessage = MutableStateFlow<String?>(null)
+    private val userMessage = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<UiState<List<WorkoutPlan>>> = combine(
         repository.observePlans(),
@@ -38,9 +39,12 @@ class PlansViewModel(
         .map { it.isNotEmpty() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
+    val message: StateFlow<String?> = userMessage
+
     fun setActive(planId: Long) {
         viewModelScope.launch {
             repository.setActivePlan(planId)
+                .onSuccess { userMessage.value = "已设为当前计划" }
                 .onFailure { errorMessage.value = it.message ?: "设置当前计划失败" }
         }
     }
@@ -48,6 +52,7 @@ class PlansViewModel(
     fun duplicate(planId: Long) {
         viewModelScope.launch {
             repository.duplicatePlan(planId)
+                .onSuccess { userMessage.value = "计划已复制" }
                 .onFailure { errorMessage.value = it.message ?: "复制计划失败" }
         }
     }
@@ -55,12 +60,17 @@ class PlansViewModel(
     fun delete(planId: Long) {
         viewModelScope.launch {
             repository.deletePlan(planId)
+                .onSuccess { userMessage.value = "计划已删除" }
                 .onFailure { errorMessage.value = it.message ?: "删除计划失败" }
         }
     }
 
     fun clearError() {
         errorMessage.value = null
+    }
+
+    fun clearMessage() {
+        userMessage.value = null
     }
 
     companion object {

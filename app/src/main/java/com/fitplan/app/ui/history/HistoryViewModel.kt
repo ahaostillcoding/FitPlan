@@ -17,6 +17,7 @@ class HistoryViewModel(
     private val repository: WorkoutRecordRepository
 ) : ViewModel() {
     private val errorMessage = MutableStateFlow<String?>(null)
+    private val userMessage = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<UiState<List<WorkoutRecord>>> = combine(
         repository.observeRecords(),
@@ -33,11 +34,18 @@ class HistoryViewModel(
         initialValue = UiState.Loading
     )
 
+    val message: StateFlow<String?> = userMessage
+
     fun delete(recordId: Long) {
         viewModelScope.launch {
             repository.deleteRecord(recordId)
+                .onSuccess { userMessage.value = "训练记录已删除" }
                 .onFailure { errorMessage.value = it.message ?: "删除训练记录失败" }
         }
+    }
+
+    fun clearMessage() {
+        userMessage.value = null
     }
 
     companion object {

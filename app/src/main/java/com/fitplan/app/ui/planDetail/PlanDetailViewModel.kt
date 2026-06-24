@@ -18,6 +18,7 @@ class PlanDetailViewModel(
     private val repository: WorkoutPlanRepository
 ) : ViewModel() {
     private val errorMessage = MutableStateFlow<String?>(null)
+    private val userMessage = MutableStateFlow<String?>(null)
 
     val uiState: StateFlow<UiState<WorkoutPlan>> = combine(
         repository.observePlan(planId),
@@ -34,9 +35,12 @@ class PlanDetailViewModel(
         initialValue = UiState.Loading
     )
 
+    val message: StateFlow<String?> = userMessage
+
     fun setActive() {
         viewModelScope.launch {
             repository.setActivePlan(planId)
+                .onSuccess { userMessage.value = "已设为当前计划" }
                 .onFailure { errorMessage.value = it.message ?: "设置当前计划失败" }
         }
     }
@@ -55,6 +59,10 @@ class PlanDetailViewModel(
                 .onSuccess { onDeleted() }
                 .onFailure { errorMessage.value = it.message ?: "删除计划失败" }
         }
+    }
+
+    fun clearMessage() {
+        userMessage.value = null
     }
 
     companion object {
