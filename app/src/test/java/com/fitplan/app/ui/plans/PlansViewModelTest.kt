@@ -3,6 +3,7 @@ package com.fitplan.app.ui.plans
 import com.fitplan.app.domain.model.WorkoutPlan
 import com.fitplan.app.ui.FakeWorkoutPlanRepository
 import com.fitplan.app.ui.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -10,6 +11,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class PlansViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()

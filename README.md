@@ -53,3 +53,8 @@ D:\fp-toolchain\gradle-8.14.3\bin\gradle.bat :app:assembleDebug
 - 阶段 2：Compose UI、MVVM、本地计划与训练记录闭环。
 - 阶段 3：DeepSeek 生成计划、设置页 API Key 保存。
 - 阶段 4：中文文案修复、删除确认、操作反馈、AI/设置体验增强、测试与发布前说明。
+- 阶段 5：训练日选择与排序、本地备份导入导出、训练恢复与休息计时、AI 连接测试、发布候选 QA。
+
+## 发布候选 QA
+
+阶段 5 的真实设备和内部测试清单见 `docs/phase5-qa-checklist.md`。

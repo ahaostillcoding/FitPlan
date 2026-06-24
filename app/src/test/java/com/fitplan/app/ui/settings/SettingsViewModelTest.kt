@@ -4,6 +4,7 @@ import com.fitplan.app.data.repository.AppSettings
 import com.fitplan.app.data.repository.DEFAULT_DEEPSEEK_MODEL
 import com.fitplan.app.data.repository.SettingsRepository
 import com.fitplan.app.ui.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -14,6 +15,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SettingsViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
