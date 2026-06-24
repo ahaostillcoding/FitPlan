@@ -19,4 +19,3 @@ fun formatFullDate(millis: Long): String {
         .atZone(ZoneId.systemDefault())
         .format(fullDateFormatter)
 }
-

@@ -72,8 +72,12 @@ private fun WorkoutSessionContent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            Text(plan.name, style = MaterialTheme.typography.headlineMedium)
-            Text(day.dayName, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("开始训练", style = MaterialTheme.typography.headlineMedium)
+            Text(plan.name, style = MaterialTheme.typography.titleMedium)
+            Text(
+                "今日训练日：${day.dayName} · 按当前计划选择",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             if (state.errorMessage != null) {
                 Text(
                     state.errorMessage,
@@ -144,4 +148,3 @@ private fun WorkoutExerciseCard(
         }
     }
 }
-

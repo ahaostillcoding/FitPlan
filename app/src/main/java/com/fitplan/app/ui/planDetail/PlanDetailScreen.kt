@@ -76,6 +76,9 @@ fun PlanDetailContent(
                         "${plan.goal} · 每周 ${plan.frequencyPerWeek} 次 · ${plan.estimatedDurationMinutes} 分钟",
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    if (plan.isActive) {
+                        Text("当前计划", color = MaterialTheme.colorScheme.primary)
+                    }
                     if (plan.notes.isNotBlank()) {
                         Text(plan.notes, modifier = Modifier.padding(top = 8.dp))
                     }
@@ -91,6 +94,17 @@ fun PlanDetailContent(
                         OutlinedButton(onClick = onDelete) { Text("删除") }
                     }
                 }
+                if (plan.days.isEmpty()) {
+                    item {
+                        Card(modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                "这个计划还没有训练日，请编辑计划后再开始训练。",
+                                modifier = Modifier.padding(16.dp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
                 items(plan.days) { day ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -98,7 +112,13 @@ fun PlanDetailContent(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(day.dayName, style = MaterialTheme.typography.titleLarge)
+                                Column {
+                                    Text(day.dayName, style = MaterialTheme.typography.titleLarge)
+                                    Text(
+                                        "按动作顺序执行",
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                                 Button(onClick = { onStartWorkout(plan.id, day.id) }) { Text("开始") }
                             }
                             day.exercises.forEach { ExerciseRow(it) }
@@ -123,4 +143,3 @@ private fun ExerciseRow(exercise: Exercise) {
         }
     }
 }
-

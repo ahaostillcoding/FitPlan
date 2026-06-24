@@ -89,7 +89,15 @@ fun HomeContent(
                     Text("目标：${plan.goal}")
                     Text("预计 ${plan.estimatedDurationMinutes} 分钟 · ${todayDay?.exercises?.size ?: 0} 个动作")
                     if (todayDay != null) {
-                        Text(todayDay.dayName, style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            "今日默认：${todayDay.dayName}",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    } else {
+                        Text(
+                            "当前计划还没有训练日，请先编辑计划。",
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(
@@ -143,7 +151,14 @@ private fun HomeContentPreview() {
                             dayName = "Day 1 胸肩三头",
                             sortOrder = 0,
                             exercises = listOf(
-                                Exercise(name = "杠铃卧推", bodyPart = "胸", sets = 4, reps = "8-10", restSeconds = 90, sortOrder = 0)
+                                Exercise(
+                                    name = "杠铃卧推",
+                                    bodyPart = "胸",
+                                    sets = 4,
+                                    reps = "8-10",
+                                    restSeconds = 90,
+                                    sortOrder = 0
+                                )
                             )
                         )
                     )
@@ -157,4 +172,3 @@ private fun HomeContentPreview() {
         )
     }
 }
-

@@ -56,28 +56,32 @@ class EditPlanViewModel(
         }
     }
 
-    fun updateName(value: String) = updateState { copy(name = value) }
-    fun updateGoal(value: String) = updateState { copy(goal = value) }
-    fun updateFrequency(value: String) = updateState { copy(frequencyPerWeek = value.filter { it.isDigit() }) }
-    fun updateDuration(value: String) = updateState { copy(estimatedDurationMinutes = value.filter { it.isDigit() }) }
+    fun updateName(value: String) = updateState { copy(name = value, errorMessage = null) }
+    fun updateGoal(value: String) = updateState { copy(goal = value, errorMessage = null) }
+    fun updateFrequency(value: String) = updateState { copy(frequencyPerWeek = value.filter { it.isDigit() }, errorMessage = null) }
+    fun updateDuration(value: String) = updateState { copy(estimatedDurationMinutes = value.filter { it.isDigit() }, errorMessage = null) }
     fun updateNotes(value: String) = updateState { copy(notes = value) }
     fun updateActive(value: Boolean) = updateState { copy(isActive = value) }
 
     fun addDay() {
         updateState {
-            copy(days = days + WorkoutDayForm(dayName = "Day ${days.size + 1}"))
+            copy(days = days + WorkoutDayForm(dayName = "Day ${days.size + 1}"), errorMessage = null)
         }
     }
 
     fun removeDay(index: Int) {
         updateState {
-            if (days.size <= 1) copy(errorMessage = "至少保留一个训练日") else copy(days = days.filterIndexed { i, _ -> i != index })
+            if (days.size <= 1) {
+                copy(errorMessage = "至少保留一个训练日")
+            } else {
+                copy(days = days.filterIndexed { i, _ -> i != index }, errorMessage = null)
+            }
         }
     }
 
     fun updateDayName(index: Int, value: String) {
         updateState {
-            copy(days = days.mapIndexed { i, day -> if (i == index) day.copy(dayName = value) else day })
+            copy(days = days.mapIndexed { i, day -> if (i == index) day.copy(dayName = value) else day }, errorMessage = null)
         }
     }
 
@@ -85,7 +89,7 @@ class EditPlanViewModel(
         updateState {
             copy(days = days.mapIndexed { i, day ->
                 if (i == dayIndex) day.copy(exercises = day.exercises + ExerciseForm()) else day
-            })
+            }, errorMessage = null)
         }
     }
 
@@ -99,7 +103,7 @@ class EditPlanViewModel(
                 } else {
                     day.copy(exercises = day.exercises.filterIndexed { j, _ -> j != exerciseIndex })
                 }
-            })
+            }, errorMessage = null)
         }
     }
 
@@ -115,7 +119,7 @@ class EditPlanViewModel(
                         }
                     )
                 }
-            })
+            }, errorMessage = null)
         }
     }
 
@@ -223,7 +227,16 @@ class EditPlanViewModel(
                     WorkoutDayForm(
                         dayName = day.dayName,
                         exercises = day.exercises.ifEmpty {
-                            listOf(Exercise(name = "", bodyPart = "", sets = 3, reps = "8-12", restSeconds = 60, sortOrder = 0))
+                            listOf(
+                                Exercise(
+                                    name = "",
+                                    bodyPart = "",
+                                    sets = 3,
+                                    reps = "8-12",
+                                    restSeconds = 60,
+                                    sortOrder = 0
+                                )
+                            )
                         }.map { exercise ->
                             ExerciseForm(
                                 name = exercise.name,
