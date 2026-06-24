@@ -68,7 +68,7 @@ private fun SettingsContent(
             ) {
                 Text("DeepSeek", style = MaterialTheme.typography.titleLarge)
                 Text(
-                    text = if (state.hasApiKey) "已配置 API Key，可在 AI 页面生成计划。" else "未配置 API Key，AI 生成暂不可用。",
+                    text = state.apiKeyStatus,
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (state.hasApiKey) {
                         MaterialTheme.colorScheme.primary

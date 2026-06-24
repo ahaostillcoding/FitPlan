@@ -44,7 +44,7 @@ class AiPlanViewModelTest {
 
         assertNotNull(viewModel.uiState.value.preview)
         assertEquals("三天新手训练计划", viewModel.uiState.value.preview?.name)
-        assertEquals("AI 计划已生成，请预览后保存", viewModel.uiState.value.message)
+        assertEquals("AI 计划已生成，请预览并确认后保存", viewModel.uiState.value.message)
     }
 
     @Test

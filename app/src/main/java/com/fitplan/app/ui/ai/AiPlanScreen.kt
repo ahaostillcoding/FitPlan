@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -187,7 +186,7 @@ private fun AiInputCard(
                 }
             }
             Text(
-                "生成前请先在设置页保存 DeepSeek API Key。AI 计划只会进入预览，不会自动覆盖现有计划。",
+                "生成前请先在设置页保存 DeepSeek API Key。AI 计划只会进入预览，不会自动覆盖现有计划；手动计划和历史记录可离线使用。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

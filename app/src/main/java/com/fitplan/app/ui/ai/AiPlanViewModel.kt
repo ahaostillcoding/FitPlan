@@ -63,13 +63,13 @@ class AiPlanViewModel(
     private val _uiState = MutableStateFlow(AiPlanUiState())
     val uiState: StateFlow<AiPlanUiState> = _uiState.asStateFlow()
 
-    fun updateGoal(value: String) = updateState { copy(goal = value, errorMessage = null) }
-    fun updateDaysPerWeek(value: String) = updateState { copy(daysPerWeek = value.filter { it.isDigit() }, errorMessage = null) }
-    fun updateDuration(value: String) = updateState { copy(durationMinutes = value.filter { it.isDigit() }, errorMessage = null) }
-    fun updateExperienceLevel(value: String) = updateState { copy(experienceLevel = value, errorMessage = null) }
-    fun updateEquipment(value: String) = updateState { copy(equipment = value, errorMessage = null) }
-    fun updateLimitations(value: String) = updateState { copy(limitations = value, errorMessage = null) }
-    fun updateNotes(value: String) = updateState { copy(notes = value, errorMessage = null) }
+    fun updateGoal(value: String) = updateState { copy(goal = value, errorMessage = null, message = null) }
+    fun updateDaysPerWeek(value: String) = updateState { copy(daysPerWeek = value.filter { it.isDigit() }, errorMessage = null, message = null) }
+    fun updateDuration(value: String) = updateState { copy(durationMinutes = value.filter { it.isDigit() }, errorMessage = null, message = null) }
+    fun updateExperienceLevel(value: String) = updateState { copy(experienceLevel = value, errorMessage = null, message = null) }
+    fun updateEquipment(value: String) = updateState { copy(equipment = value, errorMessage = null, message = null) }
+    fun updateLimitations(value: String) = updateState { copy(limitations = value, errorMessage = null, message = null) }
+    fun updateNotes(value: String) = updateState { copy(notes = value, errorMessage = null, message = null) }
 
     fun generatePlan() {
         val state = uiState.value
@@ -96,7 +96,7 @@ class AiPlanViewModel(
                             isLoading = false,
                             preview = plan.toForm(),
                             isEditingPreview = false,
-                            message = "AI 计划已生成，请预览后保存"
+                            message = "AI 计划已生成，请预览并确认后保存"
                         )
                     }
                 }
@@ -104,7 +104,7 @@ class AiPlanViewModel(
                     updateState {
                         copy(
                             isLoading = false,
-                            errorMessage = throwable.message ?: "AI 生成失败，请稍后重试"
+                            errorMessage = throwable.message ?: "AI 生成失败，请检查网络后重试"
                         )
                     }
                 }
@@ -112,11 +112,11 @@ class AiPlanViewModel(
     }
 
     fun togglePreviewEditing() {
-        updateState { copy(isEditingPreview = !isEditingPreview, errorMessage = null) }
+        updateState { copy(isEditingPreview = !isEditingPreview, errorMessage = null, message = null) }
     }
 
     fun updatePreviewPlan(updater: AiGeneratedPlanForm.() -> AiGeneratedPlanForm) {
-        updateState { copy(preview = preview?.updater(), errorMessage = null) }
+        updateState { copy(preview = preview?.updater(), errorMessage = null, message = null) }
     }
 
     fun updatePreviewDay(dayIndex: Int, dayName: String) {
@@ -155,7 +155,7 @@ class AiPlanViewModel(
         }
         val plan = preview.toWorkoutPlanOrError()
         if (plan.isFailure) {
-            updateState { copy(errorMessage = plan.exceptionOrNull()?.message ?: "计划内容不完整") }
+            updateState { copy(errorMessage = plan.exceptionOrNull()?.message ?: "计划内容不完整，请编辑后再保存") }
             return
         }
 

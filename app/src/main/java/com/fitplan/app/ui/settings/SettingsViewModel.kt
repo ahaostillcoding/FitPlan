@@ -19,6 +19,11 @@ data class SettingsUiState(
     val errorMessage: String? = null
 ) {
     val hasApiKey: Boolean = apiKey.isNotBlank()
+    val apiKeyStatus: String = if (hasApiKey) {
+        "已配置 API Key，可在 AI 页面生成计划。"
+    } else {
+        "未配置 API Key，AI 生成暂不可用；离线计划和记录不受影响。"
+    }
 }
 
 class SettingsViewModel(

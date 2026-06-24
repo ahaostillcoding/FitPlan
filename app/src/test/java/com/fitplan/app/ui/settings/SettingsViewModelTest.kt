@@ -48,6 +48,17 @@ class SettingsViewModelTest {
         assertEquals("API Key 已清空", viewModel.uiState.value.message)
     }
 
+    @Test
+    fun emptyApiKey_reportsOfflineFeaturesStillAvailable() = runTest {
+        val viewModel = SettingsViewModel(FakeSettingsRepository())
+        advanceUntilIdle()
+
+        assertEquals(
+            "未配置 API Key，AI 生成暂不可用；离线计划和记录不受影响。",
+            viewModel.uiState.value.apiKeyStatus
+        )
+    }
+
     private class FakeSettingsRepository(
         apiKey: String = "",
         model: String = DEFAULT_DEEPSEEK_MODEL
