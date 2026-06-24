@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FitPlan UI Preview</title>
+  <title>FitPlan 阶段 4 UI Preview</title>
   <style>
     :root {
       --bg: #f7faf8;
@@ -15,21 +15,18 @@
       --primary: #2e7d32;
       --danger: #b3261e;
       --radius: 8px;
-      --shadow: 0 12px 30px rgba(24, 50, 28, .08);
     }
-
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Inter, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+      font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
       color: var(--text);
-      background: linear-gradient(145deg, #ffffff 0%, var(--bg) 48%, #edf7ee 100%);
+      background: linear-gradient(145deg, #fff 0%, var(--bg) 54%, #edf7ee 100%);
       display: grid;
       place-items: center;
       padding: 24px;
     }
-
     .stage {
       width: min(1120px, 100%);
       display: grid;
@@ -37,57 +34,35 @@
       gap: 28px;
       align-items: start;
     }
-
+    .brief, .card, .dialog, .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
     .brief {
       position: sticky;
       top: 24px;
-      background: rgba(255,255,255,.82);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
       padding: 24px;
+      box-shadow: 0 12px 30px rgba(24, 50, 28, .08);
     }
-
-    .brand {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
+    .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; }
     .logo {
       width: 42px;
       height: 42px;
-      border-radius: 8px;
+      border-radius: var(--radius);
       display: grid;
       place-items: center;
       background: var(--primary);
       color: #fff;
       font-weight: 800;
     }
-
     h1, h2, h3, p { margin: 0; }
     h1 { font-size: 28px; line-height: 1.15; }
     h2 { font-size: 24px; line-height: 1.2; }
     h3 { font-size: 17px; line-height: 1.3; }
     p { color: var(--muted); line-height: 1.55; }
-
-    .feature-list {
-      list-style: none;
-      padding: 0;
-      margin: 18px 0 0;
-      display: grid;
-      gap: 10px;
-    }
-    .feature-list li {
-      padding: 11px 12px;
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      background: var(--surface);
-      font-size: 14px;
-      color: #334237;
-    }
-
+    .feature-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 10px; }
+    .feature-list li { padding: 11px 12px; border-radius: var(--radius); background: #fff; border: 1px solid var(--border); font-size: 14px; }
     .phone {
       width: 390px;
       min-height: 844px;
@@ -99,72 +74,19 @@
       box-shadow: 0 24px 80px rgba(16, 32, 18, .24);
       position: relative;
     }
-
-    .statusbar {
-      height: 28px;
-      padding: 0 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: #2d382f;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .screen {
-      height: 728px;
-      display: none;
-      overflow: auto;
-      padding: 18px 16px 96px;
-      scrollbar-width: none;
-    }
+    .statusbar { height: 28px; padding: 0 22px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 700; }
+    .screen { height: 728px; display: none; overflow: auto; padding: 18px 16px 96px; scrollbar-width: none; }
     .screen.active { display: block; }
     .screen::-webkit-scrollbar { display: none; }
-
-    .topline, .list-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .caption {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 8px 22px rgba(30, 74, 34, .05);
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-
-    .hero-card {
-      background: linear-gradient(145deg, #ffffff 0%, #f0faf1 100%);
-      border-color: #d5ead7;
-    }
-
-    .metric-row, .button-row, .field-row, .chip-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .metric {
-      flex: 1;
-      min-width: 98px;
-      background: var(--soft);
-      border-radius: var(--radius);
-      padding: 10px;
-    }
+    .topline, .list-title, .button-row, .field-row, .chip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .topline, .list-title { justify-content: space-between; margin-bottom: 14px; }
+    .caption { font-size: 13px; color: var(--muted); }
+    .card { padding: 14px; margin-bottom: 12px; box-shadow: 0 8px 22px rgba(30, 74, 34, .05); }
+    .hero-card { background: linear-gradient(145deg, #fff 0%, #f0faf1 100%); border-color: #d5ead7; }
+    .metric-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+    .metric { background: var(--soft); border-radius: var(--radius); padding: 10px; }
     .metric strong { display: block; font-size: 20px; color: var(--primary); }
     .metric span { color: var(--muted); font-size: 12px; }
-
     button {
       border: 0;
       border-radius: 999px;
@@ -177,30 +99,10 @@
       background: var(--primary);
       color: #fff;
     }
-    button.secondary {
-      background: #fff;
-      color: var(--primary);
-      border: 1px solid #b7d9bb;
-    }
-    button.danger {
-      background: #fff4f2;
-      color: var(--danger);
-      border: 1px solid #f0c7c2;
-    }
-    button.chip {
-      min-height: 32px;
-      padding: 7px 10px;
-      background: #fff;
-      color: #435147;
-      border: 1px solid var(--border);
-      font-size: 13px;
-    }
-    button.chip.active {
-      background: #e8f5e9;
-      color: var(--primary);
-      border-color: #b7d9bb;
-    }
-
+    button.secondary { background: #fff; color: var(--primary); border: 1px solid #b7d9bb; }
+    button.danger { background: #fff4f2; color: var(--danger); border: 1px solid #f0c7c2; }
+    button.chip { min-height: 32px; padding: 7px 10px; background: #fff; color: #435147; border: 1px solid var(--border); font-size: 13px; }
+    button.chip.active { background: #e8f5e9; color: var(--primary); border-color: #b7d9bb; }
     input, textarea {
       width: 100%;
       border: 1px solid var(--border);
@@ -209,55 +111,19 @@
       font: inherit;
       color: var(--text);
       background: #fff;
-      outline: none;
     }
     textarea { min-height: 72px; resize: vertical; }
-    label {
-      display: grid;
-      gap: 6px;
-      margin-bottom: 10px;
-      color: #445047;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      border-radius: 999px;
-      padding: 5px 9px;
-      background: #e8f5e9;
-      color: #276d2b;
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 8px;
-    }
-
-    .exercise {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 12px;
-      align-items: start;
-    }
-    .check {
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
-      border: 2px solid #a6cbaa;
-      background: #fff;
-      display: grid;
-      place-items: center;
-      color: #fff;
-      margin-top: 1px;
-    }
+    label { display: grid; gap: 6px; margin-bottom: 10px; color: #445047; font-size: 13px; font-weight: 700; }
+    .tag { display: inline-flex; border-radius: 999px; padding: 5px 9px; background: #e8f5e9; color: #276d2b; font-size: 12px; font-weight: 700; margin-top: 8px; }
+    .exercise { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
+    .check { width: 24px; height: 24px; border-radius: 6px; border: 2px solid #a6cbaa; background: #fff; display: grid; place-items: center; color: #fff; margin-top: 1px; }
     .check.done { background: var(--primary); border-color: var(--primary); }
-
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 12px 0;
-    }
-
+    .divider { height: 1px; background: var(--border); margin: 12px 0; }
+    .toast { position: absolute; left: 18px; right: 18px; bottom: 88px; padding: 12px 14px; box-shadow: 0 12px 28px rgba(24, 50, 28, .15); display: none; }
+    .toast.show { display: block; }
+    .dialog-backdrop { position: absolute; inset: 0; display: none; place-items: center; background: rgba(18, 28, 20, .28); padding: 24px; }
+    .dialog-backdrop.show { display: grid; }
+    .dialog { padding: 18px; box-shadow: 0 24px 80px rgba(16, 32, 18, .22); }
     .bottom-nav {
       position: absolute;
       left: 0;
@@ -270,25 +136,11 @@
       padding: 8px 8px 10px;
       background: rgba(255,255,255,.96);
       border-top: 1px solid var(--border);
-      backdrop-filter: blur(14px);
     }
-    .nav-item {
-      min-height: auto;
-      display: grid;
-      place-items: center;
-      gap: 3px;
-      border-radius: 12px;
-      background: transparent;
-      color: var(--muted);
-      padding: 8px 4px;
-    }
-    .nav-item.active {
-      background: #e8f5e9;
-      color: var(--primary);
-    }
+    .nav-item { min-height: auto; display: grid; place-items: center; gap: 3px; border-radius: 12px; background: transparent; color: var(--muted); padding: 8px 4px; }
+    .nav-item.active { background: #e8f5e9; color: var(--primary); }
     .nav-icon { font-size: 15px; font-weight: 900; }
     .nav-label { font-size: 12px; font-weight: 800; }
-
     @media (max-width: 900px) {
       body { padding: 14px; }
       .stage { grid-template-columns: 1fr; }
@@ -304,15 +156,15 @@
         <div class="logo">F</div>
         <div>
           <h1>FitPlan UI Preview</h1>
-          <p>阶段 3 可点击原型：本地计划闭环，加上 DeepSeek 设置、AI 生成、预览、编辑、保存。</p>
+          <p>阶段 4 可点击原型：中文文案、删除确认、操作反馈、AI/设置体验和离线能力说明。</p>
         </div>
       </div>
       <ul class="feature-list">
-        <li>首页快速看到“今天练什么”、本周训练次数和最近训练。</li>
-        <li>计划支持查看、编辑、复制、删除、设置当前计划。</li>
-        <li>训练执行支持勾选完成、填写备注并生成历史记录。</li>
-        <li>AI 页面支持输入需求、生成 JSON 计划、预览和编辑后保存。</li>
-        <li>设置页保存 DeepSeek API Key 和模型名，本阶段使用本机 DataStore。</li>
+        <li>首页突出“今天练什么”、本周训练次数和最近一次训练。</li>
+        <li>计划支持查看、编辑、复制、删除、设为当前；删除前确认。</li>
+        <li>训练执行支持勾选完成、填写备注并保存历史记录。</li>
+        <li>AI 生成结果先预览，可编辑后保存为新计划。</li>
+        <li>设置页保存 DeepSeek API Key；手动功能离线可用。</li>
       </ul>
     </aside>
 
@@ -328,8 +180,8 @@
         </div>
         <article class="card hero-card">
           <h3>四天增肌训练计划</h3>
-          <p>目标：增肌 · Day 1 胸肩三头</p>
-          <div class="metric-row" style="margin: 14px 0;">
+          <p>目标：增肌 · 今日默认：Day 1 胸肩三头</p>
+          <div class="metric-row">
             <div class="metric"><strong>60</strong><span>预计分钟</span></div>
             <div class="metric"><strong>5</strong><span>动作数量</span></div>
             <div class="metric"><strong>4</strong><span>每周次数</span></div>
@@ -341,25 +193,13 @@
             <button class="secondary" data-go="history">历史记录</button>
           </div>
         </article>
-        <article class="card exercise">
-          <div class="check done">✓</div>
-          <div><h3>杠铃卧推</h3><p>胸 · 4 组 · 8-10 次 · 休息 90s</p></div>
-        </article>
-        <article class="card exercise">
-          <div class="check"></div>
-          <div><h3>上斜哑铃卧推</h3><p>上胸 · 3 组 · 10-12 次 · 休息 75s</p></div>
-        </article>
-        <article class="card exercise">
-          <div class="check"></div>
-          <div><h3>坐姿推举</h3><p>肩 · 4 组 · 8-10 次 · 休息 90s</p></div>
-        </article>
+        <article class="card exercise"><div class="check done">✓</div><div><h3>杠铃卧推</h3><p>胸 · 4 组 · 8-10 次 · 休息 90s</p></div></article>
+        <article class="card exercise"><div class="check"></div><div><h3>上斜哑铃卧推</h3><p>上胸 · 3 组 · 10-12 次 · 休息 75s</p></div></article>
+        <article class="card exercise"><div class="check"></div><div><h3>坐姿推举</h3><p>肩 · 4 组 · 8-10 次 · 休息 90s</p></div></article>
       </section>
 
       <section class="screen" id="plans">
-        <div class="list-title">
-          <h2>训练计划</h2>
-          <button data-go="edit">新建</button>
-        </div>
+        <div class="list-title"><h2>训练计划</h2><button data-go="edit">新建</button></div>
         <article class="card">
           <h3>四天增肌训练计划</h3>
           <p>增肌 · 每周 4 次 · 60 分钟</p>
@@ -367,8 +207,8 @@
           <div class="button-row" style="margin-top: 14px;">
             <button data-go="detail">查看</button>
             <button class="secondary" data-go="edit">编辑</button>
-            <button class="secondary">复制</button>
-            <button class="danger">删除</button>
+            <button class="secondary" data-toast="计划已复制">复制</button>
+            <button class="danger" data-confirm="删除计划？|将删除该计划及其中的训练日和动作。此操作无法撤销。">删除</button>
           </div>
         </article>
         <article class="card">
@@ -376,33 +216,25 @@
           <p>新手入门 · 每周 3 次 · 45 分钟</p>
           <div class="button-row" style="margin-top: 14px;">
             <button data-go="detail">查看</button>
-            <button class="secondary">设为当前</button>
+            <button class="secondary" data-toast="已设为当前计划">设为当前</button>
           </div>
         </article>
       </section>
 
       <section class="screen" id="detail">
-        <div class="topline">
-          <div><h2>四天增肌训练计划</h2><p class="caption">增肌 · 每周 4 次 · 60 分钟</p></div>
-        </div>
-        <div class="button-row" style="margin-bottom: 12px;">
+        <h2>四天增肌训练计划</h2>
+        <p class="caption">增肌 · 每周 4 次 · 60 分钟 · 当前计划</p>
+        <div class="button-row" style="margin: 12px 0;">
           <button data-go="edit">编辑</button>
-          <button class="secondary">复制</button>
-          <button class="secondary">设为当前</button>
+          <button class="secondary" data-toast="计划已复制">复制</button>
+          <button class="danger" data-confirm="删除计划？|删除后该计划无法恢复，历史训练记录会保留快照。">删除</button>
         </div>
         <article class="card">
-          <div class="list-title">
-            <h3>Day 1 胸肩三头</h3>
-            <button data-go="workout">开始</button>
-          </div>
+          <div class="list-title"><div><h3>Day 1 胸肩三头</h3><p class="caption">按动作顺序执行</p></div><button data-go="workout">开始</button></div>
           <div class="divider"></div>
           <p><strong>杠铃卧推</strong><br>胸 · 4 组 · 8-10 次 · 自选重量 · 休息 90s</p>
           <div class="divider"></div>
           <p><strong>上斜哑铃卧推</strong><br>上胸 · 3 组 · 10-12 次 · 休息 75s</p>
-        </article>
-        <article class="card">
-          <h3>Day 2 背二头</h3>
-          <p>引体向上、杠铃划船、高位下拉、哑铃弯举</p>
         </article>
       </section>
 
@@ -412,153 +244,100 @@
         <article class="card">
           <label>计划名称<input value="四天增肌训练计划"></label>
           <label>训练目标<input value="增肌"></label>
-          <div class="field-row">
-            <label style="flex: 1;">每周次数<input value="4"></label>
-            <label style="flex: 1;">每次分钟<input value="60"></label>
-          </div>
+          <div class="field-row"><label style="flex:1">每周次数<input value="4"></label><label style="flex:1">每次分钟<input value="60"></label></div>
           <label>备注<textarea>适合有一定训练基础的用户。</textarea></label>
           <span class="tag">设为当前计划</span>
         </article>
         <article class="card">
           <h3>训练日 1</h3>
           <label>训练日名称<input value="Day 1 胸肩三头"></label>
-          <div class="divider"></div>
           <label>动作名称<input value="杠铃卧推"></label>
           <label>训练部位<input value="胸"></label>
-          <div class="field-row">
-            <label style="flex: 1;">组数<input value="4"></label>
-            <label style="flex: 1;">次数<input value="8-10"></label>
-          </div>
-          <div class="field-row">
-            <label style="flex: 1;">重量<input placeholder="可为空"></label>
-            <label style="flex: 1;">休息秒<input value="90"></label>
-          </div>
+          <div class="field-row"><label style="flex:1">组数<input value="4"></label><label style="flex:1">次数<input value="8-10"></label></div>
+          <div class="field-row"><label style="flex:1">重量<input placeholder="可为空"></label><label style="flex:1">休息秒<input value="90"></label></div>
           <button class="secondary">添加动作</button>
         </article>
-        <button style="width: 100%;" data-go="detail">保存计划</button>
+        <button style="width:100%" data-go="detail">保存计划</button>
       </section>
 
       <section class="screen" id="workout">
         <h2>开始训练</h2>
-        <p class="caption" style="margin-bottom: 14px;">四天增肌训练计划 · Day 1 胸肩三头</p>
+        <p class="caption" style="margin-bottom: 14px;">今日训练日：Day 1 胸肩三头 · 按当前计划选择</p>
         <article class="card exercise">
           <div class="check done">✓</div>
-          <div>
-            <h3>杠铃卧推</h3>
-            <p>胸 · 4 组 · 8-10 次 · 自选重量 · 休息 90s</p>
-            <label style="margin-top: 10px;">实际备注<input value="最后一组接近力竭"></label>
-          </div>
+          <div><h3>杠铃卧推</h3><p>胸 · 4 组 · 8-10 次 · 自选重量 · 休息 90s</p><label style="margin-top:10px">实际备注<input value="最后一组接近力竭"></label></div>
         </article>
         <article class="card exercise">
           <div class="check"></div>
-          <div>
-            <h3>坐姿推举</h3>
-            <p>肩 · 4 组 · 8-10 次 · 休息 90s</p>
-            <label style="margin-top: 10px;">实际备注<input placeholder="可填写实际感受"></label>
-          </div>
+          <div><h3>坐姿推举</h3><p>肩 · 4 组 · 8-10 次 · 休息 90s</p><label style="margin-top:10px">实际备注<input placeholder="可填写实际感受"></label></div>
         </article>
         <label>本次训练备注<textarea placeholder="整体状态、疼痛、调整..."></textarea></label>
-        <button style="width: 100%;" data-go="record-detail">完成训练</button>
+        <button style="width:100%" data-go="record-detail">完成训练</button>
       </section>
 
       <section class="screen" id="history">
-        <h2 style="margin-bottom: 14px;">训练记录</h2>
+        <h2 style="margin-bottom:14px">训练记录</h2>
         <article class="card">
           <h3>四天增肌训练计划</h3>
           <p>Day 1 胸肩三头 · 58 分钟</p>
           <p class="caption">2026年06月22日 19:40</p>
-          <div class="button-row" style="margin-top: 10px;">
-            <button data-go="record-detail">查看</button>
-            <button class="danger">删除</button>
-          </div>
-        </article>
-        <article class="card">
-          <h3>新手入门全身计划</h3>
-          <p>Day 1 全身基础 · 42 分钟</p>
-          <p class="caption">2026年06月20日 20:12</p>
+          <div class="button-row" style="margin-top:10px"><button data-go="record-detail">查看</button><button class="danger" data-confirm="删除训练记录？|将删除这条训练记录。">删除</button></div>
         </article>
       </section>
 
       <section class="screen" id="record-detail">
         <h2>训练记录详情</h2>
-        <p class="caption" style="margin-bottom: 14px;">2026年06月22日 19:40 · 58 分钟</p>
-        <article class="card">
-          <h3>四天增肌训练计划</h3>
-          <p>Day 1 胸肩三头</p>
-          <p style="margin-top: 8px;">备注：状态不错，卧推动作稳定。</p>
-        </article>
-        <article class="card">
-          <h3>已完成 · 杠铃卧推</h3>
-          <p>胸 · 4 组 · 8-10 次 · 自选重量</p>
-          <p>实际备注：最后一组接近力竭</p>
-        </article>
-        <article class="card">
-          <h3>未完成 · 坐姿推举</h3>
-          <p>肩 · 4 组 · 8-10 次</p>
-        </article>
+        <p class="caption" style="margin-bottom:14px">2026年06月22日 19:40 · 58 分钟</p>
+        <article class="card"><h3>四天增肌训练计划</h3><p>Day 1 胸肩三头</p><p style="margin-top:8px">备注：状态不错，卧推动作稳定。</p></article>
+        <article class="card"><h3>已完成 · 杠铃卧推</h3><p>胸 · 4 组 · 8-10 次 · 自选重量</p><p>备注：最后一组接近力竭</p></article>
+        <article class="card"><h3>未完成 · 坐姿推举</h3><p>肩 · 4 组 · 8-10 次</p></article>
       </section>
 
       <section class="screen" id="ai">
         <h2>AI 生成计划</h2>
-        <p class="caption" style="margin-bottom: 14px;">输入需求后调用 DeepSeek。结果先预览，可编辑，确认后才保存为新计划。</p>
+        <p class="caption" style="margin-bottom:14px">输入需求后调用 DeepSeek。结果先预览，可编辑，确认后才保存为新计划。</p>
         <article class="card">
           <h3>你的训练需求</h3>
-          <p class="caption" style="margin: 6px 0;">健身目标</p>
-          <div class="chip-row">
-            <button class="chip active">增肌</button>
-            <button class="chip">减脂</button>
-            <button class="chip">塑形</button>
-            <button class="chip">力量提升</button>
-          </div>
-          <div class="field-row" style="margin-top: 12px;">
-            <label style="flex: 1;">每周天数<input value="4"></label>
-            <label style="flex: 1;">每次分钟<input value="60"></label>
-          </div>
+          <p class="caption" style="margin:6px 0">健身目标</p>
+          <div class="chip-row"><button class="chip active">增肌</button><button class="chip">减脂</button><button class="chip">塑形</button><button class="chip">力量提升</button></div>
+          <div class="field-row" style="margin-top:12px"><label style="flex:1">每周天数<input value="4"></label><label style="flex:1">每次分钟<input value="60"></label></div>
           <p class="caption">经验水平</p>
-          <div class="chip-row" style="margin: 6px 0 12px;">
-            <button class="chip active">新手</button>
-            <button class="chip">中级</button>
-            <button class="chip">高级</button>
-          </div>
+          <div class="chip-row" style="margin:6px 0 12px"><button class="chip active">新手</button><button class="chip">中级</button><button class="chip">高级</button></div>
           <label>可用器械<textarea>徒手、哑铃、杠铃、健身房器械</textarea></label>
           <label>避开动作或受限部位<textarea placeholder="例如：膝盖不适，避免跳跃"></textarea></label>
           <label>其他备注<textarea placeholder="例如：希望训练后加 10 分钟有氧"></textarea></label>
-          <button style="width: 100%;">生成计划</button>
-          <p class="caption" style="margin-top: 10px;">未配置 API Key 时会提示前往设置；网络失败或 JSON 解析失败不会崩溃。</p>
+          <button style="width:100%" data-toast="AI 计划已生成，请预览并确认后保存">生成计划</button>
+          <p class="caption" style="margin-top:10px">未配置 API Key 时会提示前往设置；网络失败或 JSON 解析失败不会崩溃。</p>
         </article>
         <article class="card hero-card">
-          <div class="list-title">
-            <h3>生成结果预览</h3>
-            <div class="button-row">
-              <button class="secondary">编辑</button>
-              <button data-go="detail">保存计划</button>
-            </div>
-          </div>
+          <div class="list-title"><h3>生成结果预览</h3><div class="button-row"><button class="secondary">编辑</button><button data-go="detail">保存计划</button></div></div>
           <p><strong>四天增肌训练计划</strong><br>增肌 · 每周 4 次 · 每次 60 分钟</p>
           <div class="divider"></div>
           <p><strong>Day 1 胸肩三头</strong><br>杠铃卧推、上斜哑铃卧推、坐姿推举、绳索下压</p>
-          <div class="divider"></div>
-          <label>编辑示例：计划名称<input value="四天增肌训练计划"></label>
-          <label>编辑示例：动作备注<input value="注意肩胛稳定"></label>
         </article>
       </section>
 
       <section class="screen" id="settings">
         <h2>设置</h2>
-        <p class="caption" style="margin-bottom: 14px;">API Key 只保存在本机。本阶段用 DataStore，后续可升级到加密存储。</p>
+        <p class="caption" style="margin-bottom:14px">API Key 只保存在本机。本阶段用 DataStore，后续可升级到加密存储。</p>
         <article class="card">
           <h3>DeepSeek</h3>
-          <p class="tag">已配置 API Key</p>
-          <label style="margin-top: 12px;">DeepSeek API Key<input type="password" value="sk-xxxxxxxxxxxxxxxx"></label>
+          <p class="tag">已配置 API Key，可在 AI 页面生成计划。</p>
+          <label style="margin-top:12px">DeepSeek API Key<input type="password" value="sk-xxxxxxxxxxxxxxxx"></label>
           <label>模型<input value="deepseek-v4-flash"></label>
-          <div class="button-row">
-            <button>保存设置</button>
-            <button class="secondary">显示 Key</button>
-            <button class="danger">清空 Key</button>
-          </div>
-          <p class="caption" style="margin-top: 10px;">默认模型 deepseek-v4-flash；AI 页面生成时会读取这里保存的 Key。</p>
+          <div class="button-row"><button data-toast="设置已保存">保存设置</button><button class="secondary">显示 Key</button><button class="danger" data-toast="API Key 已清空">清空 Key</button></div>
+          <p class="caption" style="margin-top:10px">默认模型 deepseek-v4-flash；手动计划和历史记录可离线使用。</p>
         </article>
       </section>
+
+      <div class="toast" id="toast">操作已完成</div>
+      <div class="dialog-backdrop" id="dialog">
+        <div class="dialog">
+          <h3 id="dialog-title">删除？</h3>
+          <p id="dialog-text" style="margin:8px 0 16px">此操作无法撤销。</p>
+          <div class="button-row"><button id="dialog-confirm">确认删除</button><button class="secondary" id="dialog-cancel">取消</button></div>
+        </div>
+      </div>
 
       <nav class="bottom-nav" aria-label="Bottom navigation">
         <button class="nav-item active" data-go="home"><span class="nav-icon">今</span><span class="nav-label">首页</span></button>
@@ -572,6 +351,10 @@
 
   <script>
     const topLevel = new Set(["home", "plans", "history", "ai", "settings"]);
+    const toast = document.getElementById("toast");
+    const dialog = document.getElementById("dialog");
+    const dialogTitle = document.getElementById("dialog-title");
+    const dialogText = document.getElementById("dialog-text");
 
     function inferParent(screenId) {
       if (screenId === "detail" || screenId === "edit" || screenId === "workout") return "plans";
@@ -590,11 +373,30 @@
       });
     }
 
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
     document.addEventListener("click", event => {
-      const trigger = event.target.closest("[data-go]");
+      const trigger = event.target.closest("[data-go], [data-toast], [data-confirm]");
       if (!trigger) return;
       event.preventDefault();
-      go(trigger.dataset.go);
+      if (trigger.dataset.go) go(trigger.dataset.go);
+      if (trigger.dataset.toast) showToast(trigger.dataset.toast);
+      if (trigger.dataset.confirm) {
+        const [title, text] = trigger.dataset.confirm.split("|");
+        dialogTitle.textContent = title;
+        dialogText.textContent = text;
+        dialog.classList.add("show");
+      }
+    });
+    document.getElementById("dialog-cancel").addEventListener("click", () => dialog.classList.remove("show"));
+    document.getElementById("dialog-confirm").addEventListener("click", () => {
+      dialog.classList.remove("show");
+      showToast("已删除");
     });
   </script>
 </body>

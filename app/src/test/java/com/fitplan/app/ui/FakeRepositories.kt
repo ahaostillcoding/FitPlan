@@ -13,6 +13,7 @@ class FakeWorkoutPlanRepository(
 ) : WorkoutPlanRepository {
     private val plans = MutableStateFlow(initialPlans)
     var savedPlan: WorkoutPlan? = null
+    val currentPlans: List<WorkoutPlan> get() = plans.value
 
     override fun observePlans(): Flow<List<WorkoutPlan>> = plans
 
@@ -64,6 +65,7 @@ class FakeWorkoutRecordRepository(
 ) : WorkoutRecordRepository {
     private val records = MutableStateFlow(initialRecords)
     var savedRecord: WorkoutRecord? = null
+    val currentRecords: List<WorkoutRecord> get() = records.value
 
     override fun observeRecords(): Flow<List<WorkoutRecord>> = records
 
@@ -95,4 +97,3 @@ class FakeWorkoutRecordRepository(
         return Result.success(Unit)
     }
 }
-
