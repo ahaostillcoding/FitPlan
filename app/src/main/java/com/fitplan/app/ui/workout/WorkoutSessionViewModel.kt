@@ -39,9 +39,14 @@ data class WorkoutSessionUiState(
     val restoredFromDraft: Boolean = false,
     val activeRestExerciseId: Long? = null,
     val restSecondsRemaining: Int = 0,
+    val message: String? = null,
     val errorMessage: String? = null,
     val finishedRecordId: Long? = null
-)
+) {
+    val totalExerciseCount: Int = day?.exercises?.size ?: 0
+    val completedExerciseCount: Int = exerciseProgress.values.count { it.isCompleted }
+    val progressText: String = "$completedExerciseCount/$totalExerciseCount 已完成"
+}
 
 class WorkoutSessionViewModel(
     private val planId: Long,
@@ -69,8 +74,33 @@ class WorkoutSessionViewModel(
     }
 
     fun updateSessionNotes(notes: String) {
-        _uiState.update { it.copy(sessionNotes = notes) }
+        _uiState.update { it.copy(sessionNotes = notes, message = null, errorMessage = null) }
         persistDraft()
+    }
+
+    fun continueDraft() {
+        _uiState.update { it.copy(restoredFromDraft = false, message = "继续上次未完成训练") }
+    }
+
+    fun discardDraft() {
+        val state = _uiState.value
+        val day = state.day ?: return
+        restTimerJob?.cancel()
+        viewModelScope.launch {
+            settingsRepository.clearWorkoutDraft()
+            _uiState.update {
+                it.copy(
+                    startedAt = System.currentTimeMillis(),
+                    sessionNotes = "",
+                    exerciseProgress = defaultProgress(day),
+                    restoredFromDraft = false,
+                    activeRestExerciseId = null,
+                    restSecondsRemaining = 0,
+                    message = "已放弃上次训练草稿",
+                    errorMessage = null
+                )
+            }
+        }
     }
 
     fun startRestTimer(exerciseId: Long, seconds: Int) {
@@ -80,7 +110,11 @@ class WorkoutSessionViewModel(
             return
         }
         _uiState.update {
-            it.copy(activeRestExerciseId = exerciseId, restSecondsRemaining = seconds)
+            it.copy(
+                activeRestExerciseId = exerciseId,
+                restSecondsRemaining = seconds,
+                message = null
+            )
         }
         restTimerJob = viewModelScope.launch {
             while (isActive && _uiState.value.restSecondsRemaining > 0) {
@@ -89,7 +123,8 @@ class WorkoutSessionViewModel(
                     val next = (state.restSecondsRemaining - 1).coerceAtLeast(0)
                     state.copy(
                         restSecondsRemaining = next,
-                        activeRestExerciseId = if (next == 0) null else state.activeRestExerciseId
+                        activeRestExerciseId = if (next == 0) null else state.activeRestExerciseId,
+                        message = if (next == 0) "休息结束，可以开始下一组了" else state.message
                     )
                 }
             }
@@ -99,7 +134,11 @@ class WorkoutSessionViewModel(
     fun stopRestTimer() {
         restTimerJob?.cancel()
         _uiState.update {
-            it.copy(activeRestExerciseId = null, restSecondsRemaining = 0)
+            it.copy(
+                activeRestExerciseId = null,
+                restSecondsRemaining = 0,
+                message = if (it.restSecondsRemaining > 0) "休息已停止" else it.message
+            )
         }
     }
 
@@ -113,7 +152,7 @@ class WorkoutSessionViewModel(
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true, errorMessage = null) }
+            _uiState.update { it.copy(isSaving = true, message = null, errorMessage = null) }
             val now = System.currentTimeMillis()
             val duration = max(1, ((now - state.startedAt) / 60_000L).toInt())
             val record = WorkoutRecord(
@@ -165,9 +204,7 @@ class WorkoutSessionViewModel(
                         _uiState.update { it.copy(isLoading = false, errorMessage = "没有找到可训练的内容") }
                     } else {
                         val draft = readMatchingDraft(selectedDay.id)
-                        val defaultProgress = selectedDay.exercises.associate { exercise ->
-                            exercise.id to WorkoutExerciseProgress(exercise.id)
-                        }
+                        val defaultProgress = defaultProgress(selectedDay)
                         val restoredProgress = draft?.progress
                             ?.filter { progress -> selectedDay.exercises.any { it.id == progress.exerciseId } }
                             ?.associateBy { it.exerciseId }
@@ -206,9 +243,19 @@ class WorkoutSessionViewModel(
     ) {
         _uiState.update { state ->
             val current = state.exerciseProgress[exerciseId] ?: WorkoutExerciseProgress(exerciseId)
-            state.copy(exerciseProgress = state.exerciseProgress + (exerciseId to current.reducer()))
+            state.copy(
+                exerciseProgress = state.exerciseProgress + (exerciseId to current.reducer()),
+                message = null,
+                errorMessage = null
+            )
         }
         persistDraft()
+    }
+
+    private fun defaultProgress(day: WorkoutDay): Map<Long, WorkoutExerciseProgress> {
+        return day.exercises.associate { exercise ->
+            exercise.id to WorkoutExerciseProgress(exercise.id)
+        }
     }
 
     private fun persistDraft() {

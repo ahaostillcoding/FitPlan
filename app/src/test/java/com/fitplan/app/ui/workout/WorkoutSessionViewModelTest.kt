@@ -113,6 +113,62 @@ class WorkoutSessionViewModelTest {
     }
 
     @Test
+    fun progressTextCountsCompletedExercises() = runTest {
+        val viewModel = WorkoutSessionViewModel(
+            planId = 1,
+            dayId = 10,
+            planRepository = FakeWorkoutPlanRepository(listOf(samplePlan())),
+            recordRepository = FakeWorkoutRecordRepository(),
+            settingsRepository = FakeSettingsRepository()
+        )
+        advanceUntilIdle()
+
+        assertEquals("0/2 已完成", viewModel.uiState.value.progressText)
+
+        viewModel.updateCompleted(100, true)
+
+        assertEquals("1/2 已完成", viewModel.uiState.value.progressText)
+    }
+
+    @Test
+    fun discardDraftClearsSavedDraftAndResetsSession() = runTest {
+        val draftJson = """
+            {
+              "planId": 1,
+              "dayId": 10,
+              "startedAt": 123456,
+              "sessionNotes": "恢复训练",
+              "progress": [
+                {
+                  "exerciseId": 100,
+                  "isCompleted": true,
+                  "actualNotes": "上一轮完成"
+                }
+              ]
+            }
+        """.trimIndent()
+        val settingsRepository = FakeSettingsRepository(workoutDraftJson = draftJson)
+        val viewModel = WorkoutSessionViewModel(
+            planId = 1,
+            dayId = 10,
+            planRepository = FakeWorkoutPlanRepository(listOf(samplePlan())),
+            recordRepository = FakeWorkoutRecordRepository(),
+            settingsRepository = settingsRepository
+        )
+        advanceUntilIdle()
+
+        viewModel.discardDraft()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.restoredFromDraft)
+        assertEquals("", state.sessionNotes)
+        assertEquals("0/2 已完成", state.progressText)
+        assertEquals("", settingsRepository.current.workoutDraftJson)
+        assertEquals("已放弃上次训练草稿", state.message)
+    }
+
+    @Test
     fun restTimerCountsDownAndStops() = runTest {
         val viewModel = WorkoutSessionViewModel(
             planId = 1,
@@ -136,6 +192,7 @@ class WorkoutSessionViewModelTest {
 
         assertEquals(0, viewModel.uiState.value.restSecondsRemaining)
         assertEquals(null, viewModel.uiState.value.activeRestExerciseId)
+        assertEquals("休息结束，可以开始下一组了", viewModel.uiState.value.message)
     }
 
     @Test
@@ -222,6 +279,16 @@ class WorkoutSessionViewModelTest {
                             reps = "8-10",
                             restSeconds = 90,
                             sortOrder = 0
+                        ),
+                        Exercise(
+                            id = 101,
+                            workoutDayId = 10,
+                            name = "坐姿推举",
+                            bodyPart = "肩",
+                            sets = 4,
+                            reps = "8-10",
+                            restSeconds = 90,
+                            sortOrder = 1
                         )
                     )
                 )

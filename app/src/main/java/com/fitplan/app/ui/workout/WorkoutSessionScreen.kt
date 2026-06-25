@@ -44,6 +44,8 @@ fun WorkoutSessionScreen(
         onToggleCompleted = viewModel::updateCompleted,
         onExerciseNotes = viewModel::updateExerciseNotes,
         onSessionNotes = viewModel::updateSessionNotes,
+        onContinueDraft = viewModel::continueDraft,
+        onDiscardDraft = viewModel::discardDraft,
         onStartRest = viewModel::startRestTimer,
         onStopRest = viewModel::stopRestTimer,
         onFinish = viewModel::finishWorkout,
@@ -57,6 +59,8 @@ private fun WorkoutSessionContent(
     onToggleCompleted: (Long, Boolean) -> Unit,
     onExerciseNotes: (Long, String) -> Unit,
     onSessionNotes: (String) -> Unit,
+    onContinueDraft: () -> Unit,
+    onDiscardDraft: () -> Unit,
     onStartRest: (Long, Int) -> Unit,
     onStopRest: () -> Unit,
     onFinish: () -> Unit,
@@ -86,6 +90,11 @@ private fun WorkoutSessionContent(
                 "今日训练日：${day.dayName} · 来自当前计划选择",
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            Text(
+                state.progressText,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 6.dp)
+            )
             if (state.restSecondsRemaining > 0) {
                 Text(
                     "休息倒计时：${state.restSecondsRemaining}s",
@@ -94,10 +103,29 @@ private fun WorkoutSessionContent(
                 )
             }
             if (state.restoredFromDraft) {
+                Card(modifier = Modifier.padding(top = 8.dp)) {
+                    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("发现上次未完成训练", style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            "可以继续上次进度，也可以放弃草稿重新开始。",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(onClick = onContinueDraft) {
+                                Text("继续训练")
+                            }
+                            OutlinedButton(onClick = onDiscardDraft) {
+                                Text("放弃草稿")
+                            }
+                        }
+                    }
+                }
+            }
+            if (state.message != null) {
                 Text(
-                    "已恢复上次未完成训练",
+                    state.message,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(top = 6.dp)
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
             if (state.errorMessage != null) {
@@ -232,6 +260,8 @@ private fun WorkoutSessionContentPreview() {
         onToggleCompleted = { _, _ -> },
         onExerciseNotes = { _, _ -> },
         onSessionNotes = {},
+        onContinueDraft = {},
+        onDiscardDraft = {},
         onStartRest = { _, _ -> },
         onStopRest = {},
         onFinish = {}
