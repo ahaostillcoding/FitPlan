@@ -18,16 +18,20 @@ Use this checklist before sharing a debug or release candidate APK with internal
 
 ## Manual Regression
 
+- Fresh install the app, create the sample plan from the empty state, and confirm it becomes the active plan.
 - Create a plan with at least two workout days and multiple exercises.
+- Try invalid edit-plan fields and verify the error points to the affected day or exercise.
 - Reorder workout days and exercises, save, and reopen the detail page.
 - Select a workout day on the home page and confirm the source text updates.
 - Start a workout, mark exercises complete, start/stop rest, leave and return to verify draft recovery.
+- Try finishing a workout with unfinished exercises and verify the confirmation appears.
 - Discard a recovered draft and verify the session resets.
 - Finish a workout and confirm history uses exercise snapshots.
 - Filter history by all, this week, and this month.
 - Export backup JSON, preview import, and confirm import only adds data.
 - Configure DeepSeek API Key, test connection, generate a plan, edit preview, and save as a new plan.
 - Disable network and confirm manual plans, workout execution, history, and backup still work.
+- Collect internal tester feedback using `docs/phase8-internal-test.md`.
 
 ## Known Limits
 

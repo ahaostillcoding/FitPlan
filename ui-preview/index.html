@@ -3,1423 +3,248 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FitPlan Optimized Prototype</title>
+  <title>FitPlan 阶段 8 UI 原型</title>
   <style>
     :root {
       --bg: #eef6f0;
-      --bg-2: #e5f1e8;
       --surface: #ffffff;
-      --surface-soft: #f6fbf7;
-      --surface-strong: #edf7ef;
+      --soft: #e5f4e9;
       --text: #111b14;
       --muted: #66756b;
-      --subtle: #8a988e;
       --border: #d9e7dd;
       --primary: #267a3c;
-      --primary-2: #0e5a2c;
-      --primary-soft: #e5f4e9;
-      --success: #16823a;
-      --warning: #9a6500;
-      --warning-soft: #fff6de;
       --danger: #b42318;
-      --danger-soft: #feeceb;
-      --info: #1f5fbf;
-      --radius-sm: 10px;
-      --radius: 16px;
-      --radius-lg: 24px;
-      --shadow-sm: 0 8px 24px rgba(12, 46, 22, .08);
-      --shadow: 0 22px 60px rgba(12, 46, 22, .16);
-      --tap: 46px;
+      --warning: #9a6500;
+      --radius: 18px;
     }
-
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       min-height: 100vh;
+      font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
       color: var(--text);
-      font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(38, 122, 60, .18), transparent 34%),
-        linear-gradient(145deg, #fbfffc 0%, var(--bg) 56%, var(--bg-2) 100%);
+      background: linear-gradient(145deg, #fbfffc, var(--bg));
       display: grid;
       place-items: center;
-      padding: 28px;
+      padding: 24px;
     }
-
-    h1, h2, h3, h4, p { margin: 0; }
-    h1 { font-size: 30px; line-height: 1.1; letter-spacing: -.02em; }
-    h2 { font-size: 24px; line-height: 1.16; letter-spacing: -.02em; }
-    h3 { font-size: 17px; line-height: 1.25; }
-    h4 { font-size: 14px; }
+    h1, h2, h3, p { margin: 0; }
     p { color: var(--muted); line-height: 1.55; }
     button, input, textarea, select { font: inherit; }
-    button { border: 0; cursor: pointer; }
-    button:disabled { cursor: not-allowed; opacity: .55; }
-    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
-      outline: 3px solid rgba(38, 122, 60, .22);
-      outline-offset: 2px;
-    }
-
-    .stage {
-      width: min(1180px, 100%);
-      display: grid;
-      grid-template-columns: 360px 1fr;
-      gap: 30px;
-      align-items: start;
-    }
-
-    .brief {
-      position: sticky;
-      top: 28px;
-      padding: 24px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      background: rgba(255,255,255,.82);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-    }
-
-    .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
-    .logo {
-      width: 48px;
-      height: 48px;
-      display: grid;
-      place-items: center;
-      color: #fff;
-      border-radius: 17px;
-      font-weight: 950;
-      letter-spacing: -.04em;
-      background: linear-gradient(135deg, var(--primary), var(--primary-2));
-      box-shadow: 0 12px 24px rgba(38, 122, 60, .24);
-    }
+    button { border: 0; cursor: pointer; border-radius: 14px; min-height: 46px; padding: 0 14px; font-weight: 800; }
+    .stage { width: min(1120px, 100%); display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: start; }
+    .brief, .card, .toast, .dialog { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+    .brief { padding: 24px; position: sticky; top: 24px; box-shadow: 0 20px 60px rgba(12,46,22,.12); }
+    .brand { display: flex; gap: 14px; align-items: center; margin-bottom: 18px; }
+    .logo { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 17px; background: var(--primary); color: #fff; font-weight: 950; }
     .audit-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 10px; }
-    .audit-list li {
-      padding: 12px 13px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: #fff;
-      font-size: 14px;
-      line-height: 1.45;
-      box-shadow: var(--shadow-sm);
-    }
-    .audit-list b { color: var(--primary-2); }
-
-    .phone {
-      width: 414px;
-      min-height: 896px;
-      margin: 0 auto;
-      border: 10px solid #122117;
-      border-radius: 42px;
-      overflow: hidden;
-      background: #fbfdfb;
-      box-shadow: 0 26px 90px rgba(16, 32, 18, .28);
-      position: relative;
-    }
-    .phone::before {
-      content: "";
-      position: absolute;
-      top: 8px;
-      left: 50%;
-      width: 118px;
-      height: 22px;
-      transform: translateX(-50%);
-      border-radius: 999px;
-      background: #122117;
-      z-index: 20;
-    }
-    .statusbar {
-      height: 38px;
-      padding: 0 25px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      font-weight: 800;
-      background: #fbfdfb;
-      position: relative;
-      z-index: 5;
-    }
-
-    .screen {
-      height: 774px;
-      display: none;
-      overflow: auto;
-      padding: 0 16px 102px;
-      scrollbar-width: none;
-    }
+    .audit-list li { padding: 12px; border: 1px solid var(--border); border-radius: 14px; background: #fff; font-size: 14px; }
+    .phone { width: 414px; min-height: 896px; border: 10px solid #122117; border-radius: 42px; overflow: hidden; background: #fbfdfb; position: relative; box-shadow: 0 26px 90px rgba(16,32,18,.28); }
+    .statusbar { height: 36px; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; }
+    .screen { height: 786px; display: none; overflow: auto; padding: 14px 16px 96px; scrollbar-width: none; }
     .screen.active { display: block; }
     .screen::-webkit-scrollbar { display: none; }
-
-    .screen-head {
-      position: sticky;
-      top: 0;
-      z-index: 3;
-      margin: 0 -16px 14px;
-      padding: 14px 16px 12px;
-      background: rgba(251, 253, 251, .92);
-      border-bottom: 1px solid rgba(217, 231, 221, .72);
-      backdrop-filter: blur(18px);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-    .screen-head.plain { position: static; margin-top: 0; border-bottom: 0; background: transparent; backdrop-filter: none; }
-    .head-title { display: grid; gap: 3px; min-width: 0; }
-    .head-title h2, .head-title h3 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .head-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
-
-    .small { font-size: 12px; }
-    .tiny { font-size: 11px; }
-    .muted { color: var(--muted); }
-    .subtle { color: var(--subtle); }
-    .strong { font-weight: 850; color: var(--text); }
-    .green { color: var(--primary); }
-    .danger-text { color: var(--danger); }
-    .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .row.start { align-items: flex-start; }
+    .head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
     .stack { display: grid; gap: 12px; }
-    .stack-lg { display: grid; gap: 16px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-
-    .btn, .icon-btn, .chip, .day-tab, .nav-item {
-      min-height: var(--tap);
-      border-radius: 999px;
-      transition: transform .16s ease, background .16s ease, color .16s ease, border-color .16s ease, box-shadow .16s ease;
-    }
-    .btn:active, .icon-btn:active, .chip:active, .day-tab:active, .nav-item:active { transform: scale(.98); }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      padding: 0 16px;
-      font-weight: 850;
-      white-space: nowrap;
-      border: 1px solid transparent;
-    }
-    .btn.primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-2));
-      color: #fff;
-      box-shadow: 0 10px 22px rgba(38, 122, 60, .22);
-    }
-    .btn.secondary { background: var(--primary-soft); color: var(--primary-2); border-color: rgba(38, 122, 60, .12); }
-    .btn.ghost { background: transparent; color: var(--primary); }
-    .btn.danger { background: var(--danger-soft); color: var(--danger); }
-    .btn.full { width: 100%; }
-    .icon-btn {
-      width: var(--tap);
-      height: var(--tap);
-      display: grid;
-      place-items: center;
-      background: #fff;
-      color: var(--text);
-      border: 1px solid var(--border);
-      font-weight: 900;
-    }
-
-    .hero {
-      padding: 18px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      background:
-        radial-gradient(circle at 94% 10%, rgba(38, 122, 60, .16), transparent 32%),
-        linear-gradient(135deg, #ecf8ef, #ffffff 58%);
-      display: grid;
-      gap: 14px;
-      box-shadow: var(--shadow-sm);
-    }
-    .hero.dark {
-      color: #fff;
-      border-color: transparent;
-      background:
-        radial-gradient(circle at 88% 12%, rgba(255,255,255,.18), transparent 28%),
-        linear-gradient(135deg, #1f7b3a, #0f4e29);
-    }
-    .hero.dark p, .hero.dark .muted { color: rgba(255,255,255,.76); }
-
-    .card {
-      padding: 15px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--surface);
-      box-shadow: var(--shadow-sm);
-    }
-    .card.flat { box-shadow: none; }
-    .card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
-
-    .stat {
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: #fff;
-    }
-    .stat .value { margin-top: 4px; color: var(--primary-2); font-size: 22px; font-weight: 950; letter-spacing: -.02em; }
-
-    .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; }
-    .chip-row::-webkit-scrollbar { display: none; }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 0 13px;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-    .chip.active { border-color: var(--primary); background: var(--primary); color: #fff; }
-    .chip.soft { background: var(--primary-soft); border-color: transparent; color: var(--primary-2); }
-    .chip.warn { background: var(--warning-soft); color: var(--warning); border-color: #f2d48a; }
-
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-height: 48px;
-      padding: 0 12px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: #fff;
-    }
-    .search-box input { border: 0; padding: 0; min-height: 40px; box-shadow: none; }
-
-    .list { display: grid; gap: 11px; }
-    .list-item {
-      padding: 14px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: #fff;
-      display: grid;
-      gap: 10px;
-      box-shadow: var(--shadow-sm);
-    }
-    .meta { display: flex; gap: 7px; flex-wrap: wrap; color: var(--muted); font-size: 12px; }
-    .meta span { padding: 4px 8px; border-radius: 999px; background: var(--surface-soft); border: 1px solid var(--border); }
-
-    .week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-    .week-day {
-      min-height: 58px;
-      display: grid;
-      place-items: center;
-      gap: 3px;
-      border-radius: 16px;
-      background: #fff;
-      border: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--muted);
-    }
-    .week-day.done { color: #fff; background: var(--primary); border-color: var(--primary); }
-    .week-day.today { color: var(--primary-2); background: var(--primary-soft); border-color: rgba(38,122,60,.3); }
-    .week-day.rest { opacity: .55; }
-
-    .ring {
-      width: 74px;
-      height: 74px;
-      flex: 0 0 auto;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: conic-gradient(#fff 0 60%, rgba(255,255,255,.2) 60% 100%);
-      color: #fff;
-      font-weight: 950;
-      box-shadow: inset 0 0 0 9px rgba(255,255,255,.08);
-    }
-    .progress { height: 9px; border-radius: 999px; background: #e4eee6; overflow: hidden; }
-    .progress span { display: block; height: 100%; width: var(--progress, 0%); border-radius: inherit; background: linear-gradient(90deg, var(--primary), #69b36d); transition: width .25s ease; }
-
-    label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 800; }
-    input, textarea, select {
-      width: 100%;
-      min-height: 46px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: #fff;
-      color: var(--text);
-      padding: 11px 12px;
-      outline: 0;
-      box-shadow: inset 0 1px 0 rgba(0,0,0,.02);
-    }
-    textarea { min-height: 82px; resize: vertical; }
-    input:focus, textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(38, 122, 60, .10); }
-    .field-error input, .field-error textarea, .field-error select { border-color: var(--danger); box-shadow: 0 0 0 4px rgba(180, 35, 24, .10); }
-    .error-msg { display: none; color: var(--danger); font-size: 12px; font-weight: 750; }
-    .field-error .error-msg { display: block; }
-
-    .number-card { padding: 12px; border: 1px solid var(--border); border-radius: 15px; background: #fff; }
-    .number-card input { border: 0; min-height: 34px; padding: 0; font-size: 25px; font-weight: 950; color: var(--primary-2); box-shadow: none; }
-
-    .switch-row {
-      padding: 13px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .switch {
-      width: 54px;
-      height: 32px;
-      border-radius: 999px;
-      background: #d7e2da;
-      position: relative;
-      flex: 0 0 auto;
-      border: 1px solid transparent;
-    }
-    .switch::after {
-      content: "";
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,.18);
-      transition: left .18s ease;
-    }
-    .switch.on { background: var(--primary); }
-    .switch.on::after { left: 24px; }
-
-    .stepper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
-    .step {
-      min-height: 48px;
-      padding: 8px;
-      display: grid;
-      place-items: center;
-      gap: 2px;
-      border-radius: 15px;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 850;
-    }
-    .step.active { color: var(--primary-2); border-color: rgba(38,122,60,.35); background: var(--primary-soft); }
-
-    .day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-    .day-tabs::-webkit-scrollbar { display: none; }
-    .day-tab {
-      min-width: 122px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--text);
-      text-align: left;
-      display: grid;
-      gap: 2px;
-      border-radius: 16px;
-    }
-    .day-tab strong { font-size: 13px; }
-    .day-tab span { color: var(--muted); font-size: 12px; }
-    .day-tab.active { border-color: var(--primary); background: var(--primary-soft); }
-    .day-tab.add { color: var(--primary-2); border-style: dashed; }
-
-    .exercise {
-      padding: 13px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: #fff;
-      display: grid;
-      gap: 11px;
-      box-shadow: var(--shadow-sm);
-    }
-    .exercise.done { border-color: #98d3a2; background: #f1fbf3; }
-    .exercise.active { border-color: rgba(38,122,60,.4); box-shadow: 0 12px 30px rgba(38,122,60,.12); }
-    .compact-grid { display: grid; grid-template-columns: 1fr 74px 86px; gap: 8px; }
-    .mini-actions { display: flex; gap: 7px; justify-content: flex-end; flex-wrap: wrap; }
-    .mini-actions button {
-      min-height: 36px;
-      padding: 0 10px;
-      border-radius: 999px;
-      background: var(--surface-soft);
-      color: var(--primary);
-      font-size: 12px;
-      font-weight: 850;
-    }
-    .mini-actions button.danger-link { color: var(--danger); background: var(--danger-soft); }
-    .add-block {
-      width: 100%;
-      min-height: 48px;
-      border: 1px dashed #93c99d;
-      border-radius: 16px;
-      background: #f8fcf8;
-      color: var(--primary-2);
-      font-weight: 900;
-    }
-
-    .sticky-actions {
-      position: sticky;
-      bottom: 0;
-      z-index: 4;
-      margin: 14px -16px -102px;
-      padding: 12px 16px 16px;
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 10px;
-      background: rgba(251,253,251,.95);
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-    }
-
-    .notice {
-      padding: 12px 13px;
-      border: 1px solid #eed287;
-      border-radius: 16px;
-      background: var(--warning-soft);
-      color: var(--warning);
-      font-size: 13px;
-      line-height: 1.45;
-      font-weight: 700;
-    }
-    .empty {
-      padding: 26px 16px;
-      text-align: center;
-      border: 1px dashed #a5c9ab;
-      background: #f8fcf8;
-      border-radius: 16px;
-    }
-
-    .bottom-nav {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 82px;
-      background: rgba(255,255,255,.95);
-      border-top: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      padding: 8px 8px 12px;
-      z-index: 10;
-      backdrop-filter: blur(16px);
-    }
-    .nav-item {
-      display: grid;
-      place-items: center;
-      gap: 2px;
-      color: var(--muted);
-      background: transparent;
-      font-size: 11px;
-      font-weight: 850;
-    }
-    .nav-item span:first-child { font-size: 20px; line-height: 1; }
-    .nav-item.active { color: var(--primary-2); background: var(--primary-soft); }
-
-    .toast {
-      position: absolute;
-      left: 22px;
-      right: 22px;
-      bottom: 92px;
-      z-index: 30;
-      display: none;
-      padding: 13px 14px;
-      border-radius: 16px;
-      background: #1d2f22;
-      color: #fff;
-      font-size: 13px;
-      box-shadow: var(--shadow);
-    }
-    .toast.show { display: block; animation: toastIn .18s ease; }
-    @keyframes toastIn { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-    .modal-backdrop {
-      position: absolute;
-      inset: 0;
-      z-index: 40;
-      display: none;
-      place-items: end center;
-      padding: 18px;
-      background: rgba(9, 20, 12, .38);
-      backdrop-filter: blur(5px);
-    }
-    .modal-backdrop.show { display: grid; }
-    .modal {
-      width: 100%;
-      padding: 18px;
-      border-radius: 24px;
-      background: #fff;
-      box-shadow: var(--shadow);
-      display: grid;
-      gap: 14px;
-      animation: sheetIn .2s ease;
-    }
-    @keyframes sheetIn { from { transform: translateY(22px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-    .record-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
-    .timer { font-size: 32px; font-weight: 950; letter-spacing: -.04em; color: var(--primary-2); }
-    .hide { display: none !important; }
-
-    @media (max-width: 900px) {
-      body { padding: 14px; }
-      .stage { grid-template-columns: 1fr; }
-      .brief { position: static; }
-      .phone { width: min(414px, 100%); }
-    }
+    .card { padding: 16px; box-shadow: 0 8px 24px rgba(12,46,22,.06); }
+    .hero { background: linear-gradient(135deg, #267a3c, #0e5a2c); color: #fff; border: 0; }
+    .hero p { color: rgba(255,255,255,.82); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-secondary { background: var(--soft); color: var(--primary); }
+    .btn-ghost { background: transparent; color: var(--primary); }
+    .btn-danger { background: #feeceb; color: var(--danger); }
+    .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+    .chip { white-space: nowrap; padding: 8px 12px; border-radius: 999px; border: 1px solid var(--border); background: #fff; font-size: 13px; font-weight: 800; }
+    .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .stat { background: var(--soft); padding: 12px; border-radius: 14px; }
+    .stat strong { display: block; font-size: 22px; color: var(--primary); }
+    input, textarea, select { width: 100%; border: 1px solid var(--border); border-radius: 14px; padding: 12px; background: #fff; }
+    textarea { min-height: 76px; resize: vertical; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 800; }
+    .notice { padding: 12px; border-radius: 14px; background: #fff6de; color: var(--warning); border: 1px solid #f2d48a; font-size: 13px; }
+    .bottom-nav { position: absolute; left: 0; right: 0; bottom: 0; height: 76px; display: grid; grid-template-columns: repeat(5, 1fr); background: #fff; border-top: 1px solid var(--border); padding: 8px; }
+    .nav { background: transparent; color: var(--muted); display: grid; place-items: center; gap: 2px; font-size: 11px; }
+    .nav.active { color: var(--primary); background: var(--soft); }
+    .toast { position: absolute; left: 22px; right: 22px; bottom: 88px; padding: 12px; background: #203323; color: #fff; display: none; z-index: 8; }
+    .toast.show { display: block; }
+    .dialog { position: absolute; left: 18px; right: 18px; bottom: 88px; padding: 16px; display: none; z-index: 9; box-shadow: 0 20px 60px rgba(12,46,22,.22); }
+    .dialog.show { display: grid; gap: 12px; }
+    @media (max-width: 900px) { .stage { grid-template-columns: 1fr; } .brief { position: static; } .phone { width: min(414px, 100%); } }
   </style>
 </head>
 <body>
   <main class="stage">
     <aside class="brief">
-      <div class="brand">
-        <div class="logo">F</div>
-        <div>
-          <h1>FitPlan</h1>
-          <p>优化版 HTML 原型</p>
-        </div>
-      </div>
-      <p>本版保留原有首页、计划、记录、AI、设置五个主入口，并把“仅提示”的动作升级为可感知的真实交互。</p>
+      <div class="brand"><div class="logo">F</div><div><h1>FitPlan</h1><p>阶段 8 内测体验原型</p></div></div>
+      <p>本版聚焦首次使用、误操作防护、AI 预览保存、备份风险提示和内测验收路径。</p>
       <ul class="audit-list">
-        <li><b>视觉层级：</b>首页强化今日训练 CTA，减少同级按钮堆叠。</li>
-        <li><b>导航反馈：</b>编辑、详情、训练等子页面会自动归属到对应主入口。</li>
-        <li><b>表单体验：</b>新增必填校验、错误提示、目标单选和当前计划开关。</li>
-        <li><b>计划编辑：</b>训练日、动作支持新增、删除、上移、下移。</li>
-        <li><b>危险操作：</b>删除计划/动作/记录改为底部确认弹层。</li>
-        <li><b>训练执行：</b>完成状态会实时更新进度，不再只是 toast。</li>
-        <li><b>AI 生成：</b>生成结果先进入预览，避免直接覆盖已有计划。</li>
-        <li><b>移动端触控：</b>按钮高度、吸底操作区、横向标签滚动更接近 App 使用。</li>
+        <li><b>首次使用：</b>空状态可一键创建示例计划，快速进入训练闭环。</li>
+        <li><b>防误操作：</b>未完成动作、删除、放弃草稿、导入备份都有确认。</li>
+        <li><b>可访问性：</b>主操作不小于 48dp，按钮语义更清晰。</li>
+        <li><b>质量闭环：</b>HTML、README、内测清单和构建验证同步。</li>
       </ul>
     </aside>
 
-    <section class="phone" aria-label="FitPlan mobile preview">
+    <section class="phone" aria-label="FitPlan 阶段 8 移动端原型">
       <div class="statusbar"><span>9:41</span><span>FitPlan</span></div>
 
       <section class="screen active" id="home">
-        <div class="screen-head plain">
-          <div class="head-title">
-            <p class="small">晚上好，今天练什么</p>
-            <h2>Day 1 胸肩三头</h2>
-          </div>
-          <button class="icon-btn" data-screen="settings" aria-label="设置">⚙</button>
+        <div class="head"><div><p>晚上好，今天练什么</p><h2>Day 1 胸肩三头</h2></div><button class="btn-ghost" data-screen="settings">设置</button></div>
+        <div class="card hero stack">
+          <span class="chip" style="width:max-content">当前计划</span>
+          <h2>四天增肌训练计划</h2>
+          <p>今天预计 60 分钟 · 5 个动作 · 来源：当前计划第一个训练日</p>
+          <div class="grid-2"><button class="btn-secondary" data-screen="workout">开始训练</button><button class="btn-ghost" style="color:#fff" data-screen="detail">查看计划</button></div>
         </div>
-
-        <div class="hero dark">
-          <div class="row start">
-            <div class="stack" style="gap:6px">
-              <span class="chip soft" style="width:max-content">当前计划</span>
-              <h2>四天增肌训练计划</h2>
-              <p>今天预计 60 分钟 · 5 个动作 · 已完成 60%</p>
-            </div>
-            <div class="ring">60%</div>
-          </div>
-          <div class="grid-2">
-            <button class="btn primary" data-screen="workout" style="background:#fff;color:var(--primary-2);box-shadow:none">开始训练</button>
-            <button class="btn ghost" data-screen="detail" style="color:#fff;background:rgba(255,255,255,.14)">查看计划</button>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:14px">
-          <div class="card-head">
-            <div>
-              <h3>本周节奏</h3>
-              <p class="small">完成 3/4 次，周六建议安排腿臀训练</p>
-            </div>
-            <span class="chip warn">建议</span>
-          </div>
-          <div class="week-strip">
-            <div class="week-day done"><span>一</span><strong>练</strong></div>
-            <div class="week-day done"><span>二</span><strong>练</strong></div>
-            <div class="week-day rest"><span>三</span><strong>休</strong></div>
-            <div class="week-day done"><span>四</span><strong>练</strong></div>
-            <div class="week-day today"><span>五</span><strong>今</strong></div>
-            <div class="week-day"><span>六</span><strong>腿</strong></div>
-            <div class="week-day rest"><span>日</span><strong>休</strong></div>
-          </div>
-        </div>
-
-        <div class="grid-3" style="margin-top:12px">
-          <div class="stat"><p class="small">本周训练</p><div class="value">3</div><p class="tiny">次</p></div>
-          <div class="stat"><p class="small">近 7 天</p><div class="value">180</div><p class="tiny">分钟</p></div>
-          <div class="stat"><p class="small">连续</p><div class="value">6</div><p class="tiny">天记录</p></div>
-        </div>
-
         <div class="card stack" style="margin-top:12px">
-          <div class="card-head" style="margin-bottom:0">
-            <h3>快捷入口</h3>
-            <button class="btn ghost" data-screen="history">查看记录</button>
-          </div>
-          <div class="grid-2">
-            <button class="btn secondary" data-screen="edit">新建计划</button>
-            <button class="btn secondary" data-screen="ai">AI 生成</button>
-          </div>
+          <h3>首次使用快速开始</h3>
+          <p>如果还没有计划，可以创建一份本地示例计划。示例只写入本机数据库，可随时编辑或删除。</p>
+          <div class="grid-2"><button class="btn-primary" data-toast="已创建示例计划，并设为当前计划">创建示例计划</button><button class="btn-secondary" data-screen="edit">手动创建</button></div>
         </div>
-
-        <div class="card" style="margin-top:12px">
-          <div class="card-head">
-            <h3>最近一次</h3>
-            <span class="small muted">昨天 19:30</span>
-          </div>
-          <p>完成 Day 2 背二头，训练 58 分钟。坐姿划船重量保持稳定。</p>
+        <div class="grid-3" style="margin-top:12px">
+          <div class="stat"><p>本周</p><strong>3</strong><p>次</p></div>
+          <div class="stat"><p>近 7 天</p><strong>180</strong><p>分钟</p></div>
+          <div class="stat"><p>连续</p><strong>6</strong><p>天记录</p></div>
+        </div>
+        <div class="card stack" style="margin-top:12px">
+          <div class="row"><h3>快捷入口</h3><button class="btn-ghost" data-screen="history">查看记录</button></div>
+          <div class="grid-2"><button class="btn-secondary" data-screen="edit">新建计划</button><button class="btn-secondary" data-screen="ai">AI 生成</button></div>
         </div>
       </section>
 
       <section class="screen" id="plans">
-        <div class="screen-head">
-          <div class="head-title">
-            <p class="small">我的计划</p>
-            <h2>训练计划</h2>
-          </div>
-          <button class="btn primary" data-screen="edit">新建</button>
-        </div>
-
+        <div class="head"><div><p>我的计划</p><h2>训练计划</h2></div><button class="btn-primary" data-screen="edit">新建</button></div>
         <div class="stack">
-          <div class="search-box"><span>⌕</span><input id="planSearch" placeholder="搜索计划名称、训练日或目标" /></div>
-          <div class="chip-row" data-filter-group="plans">
-            <button class="chip active" data-filter="all">全部</button>
-            <button class="chip" data-filter="current">当前</button>
-            <button class="chip" data-filter="muscle">增肌</button>
-            <button class="chip" data-filter="beginner">新手</button>
-          </div>
-
-          <article class="list-item plan-card" data-tags="current muscle 四天增肌训练计划 胸肩三头 背二头 腿臀">
-            <div class="row start">
-              <div class="stack" style="gap:5px">
-                <h3>四天增肌训练计划</h3>
-                <p class="small">当前计划 · 4 天/周 · 60 分钟</p>
-              </div>
-              <span class="chip active">当前</span>
-            </div>
-            <div class="meta"><span>胸肩三头</span><span>背二头</span><span>腿臀</span><span>全身泵感</span></div>
-            <div class="progress" style="--progress:72%"><span></span></div>
-            <div class="row">
-              <button class="btn secondary" data-screen="detail">查看详情</button>
-              <button class="btn ghost" data-toast="已复制计划，可继续编辑">复制</button>
-            </div>
+          <input placeholder="搜索计划名称、训练日或目标" />
+          <article class="card stack">
+            <div class="row"><div><h3>四天增肌训练计划</h3><p>当前计划 · 4 天/周 · 60 分钟</p></div><span class="chip active">当前</span></div>
+            <p>胸肩三头 · 背二头 · 腿臀 · 全身泵感</p>
+            <div class="grid-2"><button class="btn-secondary" data-screen="detail">查看详情</button><button class="btn-ghost" data-toast="已复制计划，可继续编辑">复制</button></div>
           </article>
-
-          <article class="list-item plan-card" data-tags="beginner 新手入门三天计划 恢复训练">
-            <div class="row start">
-              <div class="stack" style="gap:5px">
-                <h3>新手入门三天计划</h3>
-                <p class="small">3 天/周 · 45 分钟 · 适合恢复训练</p>
-              </div>
-            </div>
-            <div class="meta"><span>基础力量</span><span>动作学习</span><span>低压力</span></div>
-            <div class="row">
-              <button class="btn secondary" data-screen="detail">查看详情</button>
-              <button class="btn ghost" data-toast="已设为当前计划">设为当前</button>
-            </div>
-          </article>
-
-          <div class="empty hide" id="planEmpty">
-            <h3>没有找到相关计划</h3>
-            <p class="small">换个关键词，或直接新建一份训练计划。</p>
-          </div>
         </div>
       </section>
 
       <section class="screen" id="detail">
-        <div class="screen-head">
-          <button class="icon-btn" data-screen="plans" aria-label="返回">‹</button>
-          <div class="head-title">
-            <p class="small">当前计划</p>
-            <h3>四天增肌训练计划</h3>
-          </div>
-          <div class="head-actions">
-            <button class="icon-btn" data-screen="edit" aria-label="编辑">✎</button>
-            <button class="icon-btn" data-confirm="删除计划||删除后不会影响已保存的历史训练记录。||danger" aria-label="删除">⌫</button>
-          </div>
-        </div>
-
-        <div class="hero">
-          <div class="row start">
-            <div class="stack" style="gap:6px">
-              <span class="chip soft" style="width:max-content">增肌 · 中级</span>
-              <h2>四天增肌训练计划</h2>
-              <p>适合有一定训练基础的用户，重点提升胸背腿基础力量。</p>
-            </div>
-          </div>
-          <div class="grid-3">
-            <div class="stat"><p class="small">频率</p><div class="value">4</div><p class="tiny">天/周</p></div>
-            <div class="stat"><p class="small">时长</p><div class="value">60</div><p class="tiny">分钟</p></div>
-            <div class="stat"><p class="small">动作</p><div class="value">20</div><p class="tiny">个</p></div>
-          </div>
-          <button class="btn primary full" data-screen="workout">开始 Day 1</button>
-        </div>
-
-        <div class="card stack" style="margin-top:14px">
-          <div class="card-head" style="margin-bottom:0">
-            <h3>训练日安排</h3>
-            <button class="btn ghost" data-screen="edit">调整</button>
-          </div>
-          <details class="list-item" open>
-            <summary class="strong">Day 1 胸肩三头</summary>
-            <p style="margin-top:8px">杠铃卧推、上斜哑铃卧推、坐姿肩推、侧平举、绳索下压</p>
-          </details>
-          <details class="list-item">
-            <summary class="strong">Day 2 背二头</summary>
-            <p style="margin-top:8px">高位下拉、杠铃划船、坐姿划船、面拉、哑铃弯举</p>
-          </details>
-          <details class="list-item">
-            <summary class="strong">Day 3 腿臀</summary>
-            <p style="margin-top:8px">深蹲、腿举、罗马尼亚硬拉、臀推、腿弯举</p>
-          </details>
+        <div class="head"><button class="btn-ghost" data-screen="plans">返回</button><h3>计划详情</h3><button class="btn-danger" data-confirm="删除计划||删除后不会影响已保存的历史训练记录。">删除</button></div>
+        <div class="card stack">
+          <span class="chip active" style="width:max-content">当前计划</span>
+          <h2>四天增肌训练计划</h2>
+          <p>适合有一定训练基础的用户，重点提升胸背腿基础力量。</p>
+          <div class="grid-3"><div class="stat"><p>频率</p><strong>4</strong></div><div class="stat"><p>时长</p><strong>60</strong></div><div class="stat"><p>训练日</p><strong>4</strong></div></div>
+          <button class="btn-primary" data-screen="workout">开始 Day 1</button>
         </div>
       </section>
 
       <section class="screen" id="edit">
-        <div class="screen-head">
-          <button class="icon-btn" data-screen="plans" aria-label="返回">‹</button>
-          <div class="head-title">
-            <p class="small">计划编辑器</p>
-            <h3>新建训练计划</h3>
-          </div>
-          <button class="btn secondary" id="previewPlanBtn">预览</button>
-        </div>
-
-        <div class="stepper">
-          <div class="step active"><strong>1</strong><span>基础</span></div>
-          <div class="step"><strong>2</strong><span>训练日</span></div>
-          <div class="step"><strong>3</strong><span>动作</span></div>
-        </div>
-
-        <div class="card stack" style="margin-top:12px">
-          <div class="card-head" style="margin-bottom:0">
+        <div class="head"><button class="btn-ghost" data-screen="plans">返回</button><div><p>计划编辑器</p><h3>新建训练计划</h3></div><button class="btn-ghost" data-toast="预览：4 天/周，当前训练日 2 个动作">预览</button></div>
+        <div class="stack">
+          <div class="card stack">
             <h3>计划基础</h3>
-            <span class="small muted">必填</span>
+            <label>计划名称<input value="四天增肌训练计划" /></label>
+            <div class="chip-row"><span class="chip active">增肌</span><span class="chip">减脂</span><span class="chip">塑形</span><span class="chip">力量</span></div>
+            <div class="grid-2"><label>每周次数<input value="4" /></label><label>每次分钟<input value="60" /></label></div>
           </div>
-          <label id="planNameField">计划名称
-            <input id="planName" value="四天增肌训练计划" />
-            <span class="error-msg">请输入计划名称</span>
-          </label>
-          <div>
-            <p class="small strong">训练目标</p>
-            <div class="chip-row selectable" data-select-one="goal" style="margin-top:8px">
-              <button class="chip active" data-value="增肌">增肌</button>
-              <button class="chip" data-value="减脂">减脂</button>
-              <button class="chip" data-value="塑形">塑形</button>
-              <button class="chip" data-value="力量">力量</button>
-              <button class="chip" data-value="耐力">耐力</button>
-            </div>
+          <div class="card stack">
+            <h3>训练日与动作</h3>
+            <div class="chip-row"><span class="chip active">Day 1 胸肩三头</span><span class="chip">Day 2 背二头</span><span class="chip">+ 添加</span></div>
+            <label>动作名称<input value="杠铃卧推" /></label>
+            <div class="grid-3"><label>部位<input value="胸" /></label><label>组数<input value="4" /></label><label>次数<input value="8-10" /></label></div>
+            <button class="btn-secondary" data-toast="错误会定位到具体训练日和动作">保存计划</button>
           </div>
-          <div class="grid-2">
-            <label class="number-card" id="weekCountField">每周次数
-              <input id="weekCount" value="4" inputmode="numeric" />
-              <span class="error-msg">请输入 1-7</span>
-            </label>
-            <label class="number-card" id="minuteField">每次分钟
-              <input id="minuteCount" value="60" inputmode="numeric" />
-              <span class="error-msg">请输入 10-240</span>
-            </label>
-          </div>
-          <label>备注
-            <textarea>适合有一定训练基础的用户。</textarea>
-          </label>
-          <div class="switch-row">
-            <div>
-              <h3>设为当前计划</h3>
-              <p class="small">首页会优先展示这个计划</p>
-            </div>
-            <button class="switch on" id="currentSwitch" aria-label="设为当前计划" aria-pressed="true"></button>
-          </div>
-        </div>
-
-        <div class="card stack" style="margin-top:12px">
-          <div class="card-head" style="margin-bottom:0">
-            <h3>训练日</h3>
-            <button class="btn secondary" id="addDayBtn">+ 添加</button>
-          </div>
-          <div class="day-tabs" id="dayTabs">
-            <button class="day-tab active" data-day-index="0"><strong>Day 1</strong><span>胸肩三头</span></button>
-            <button class="day-tab" data-day-index="1"><strong>Day 2</strong><span>背二头</span></button>
-            <button class="day-tab add" id="addDayTab"><strong>+ 添加</strong><span>训练日</span></button>
-          </div>
-          <label>当前训练日名称
-            <input id="dayName" value="Day 1 胸肩三头" />
-          </label>
-        </div>
-
-        <div class="card stack" style="margin-top:12px">
-          <div class="card-head" style="margin-bottom:0">
-            <div>
-              <h3>动作列表</h3>
-              <p class="small" id="exerciseCountText">2 个动作 · 按执行顺序排列</p>
-            </div>
-            <button class="btn secondary" id="addExerciseBtn">+ 动作</button>
-          </div>
-          <div class="list" id="exerciseList">
-            <article class="exercise" data-exercise>
-              <div class="row"><h3>动作 1</h3><span class="small muted">主要动作</span></div>
-              <label>动作名称<input value="杠铃卧推" data-required="true" /></label>
-              <div class="compact-grid">
-                <label>部位<input value="胸" /></label>
-                <label>组数<input value="4" inputmode="numeric" /></label>
-                <label>次数<input value="8-10" /></label>
-              </div>
-              <div class="grid-2">
-                <label>重量<input placeholder="可为空" /></label>
-                <label>休息秒<input value="90" inputmode="numeric" /></label>
-              </div>
-              <label>备注<textarea>注意肩胛稳定</textarea></label>
-              <div class="mini-actions">
-                <button data-move="up">上移</button>
-                <button data-move="down">下移</button>
-                <button class="danger-link" data-remove-exercise>删除</button>
-              </div>
-            </article>
-
-            <article class="exercise" data-exercise>
-              <div class="row"><h3>动作 2</h3><span class="small muted">辅助动作</span></div>
-              <label>动作名称<input value="上斜哑铃卧推" data-required="true" /></label>
-              <div class="compact-grid">
-                <label>部位<input value="上胸" /></label>
-                <label>组数<input value="3" inputmode="numeric" /></label>
-                <label>次数<input value="10-12" /></label>
-              </div>
-              <div class="grid-2">
-                <label>重量<input placeholder="可为空" /></label>
-                <label>休息秒<input value="75" inputmode="numeric" /></label>
-              </div>
-              <label>备注<textarea placeholder="可选"></textarea></label>
-              <div class="mini-actions">
-                <button data-move="up">上移</button>
-                <button data-move="down">下移</button>
-                <button class="danger-link" data-remove-exercise>删除</button>
-              </div>
-            </article>
-          </div>
-          <button class="add-block" id="addExerciseBlock">+ 添加动作</button>
-        </div>
-
-        <div class="sticky-actions">
-          <button class="btn secondary" id="previewPlanBtn2">预览计划</button>
-          <button class="btn primary" id="savePlanBtn">保存计划</button>
         </div>
       </section>
 
       <section class="screen" id="workout">
-        <div class="screen-head">
-          <button class="icon-btn" data-screen="home" aria-label="返回">‹</button>
-          <div class="head-title">
-            <p class="small">当前计划 · Day 1</p>
-            <h3>胸肩三头训练</h3>
-          </div>
-          <button class="btn secondary" data-toast="草稿已保存">保存</button>
+        <div class="head"><button class="btn-ghost" data-screen="home">返回</button><div><p>当前计划 · Day 1</p><h3>胸肩三头训练</h3></div></div>
+        <div class="card stack">
+          <h3>3/5 已完成</h3>
+          <p>完成训练前如果还有未完成动作，会先询问是否仍然保存记录。</p>
+          <button class="btn-secondary" data-toast="休息结束，可以开始下一组了">开始休息</button>
         </div>
-
-        <div class="hero">
-          <div class="row start">
-            <div>
-              <p class="small">训练进行中</p>
-              <h2 id="workoutTitle">3/5 已完成</h2>
-            </div>
-            <div class="timer" id="timer">24:36</div>
-          </div>
-          <div class="progress" id="workoutProgress" style="--progress:60%"><span></span></div>
-          <p class="small">完成动作会实时更新进度；结束后保存动作快照，不受后续计划编辑影响。</p>
-        </div>
-
-        <div class="list" id="workoutList" style="margin-top:12px">
-          <article class="exercise done" data-workout-exercise>
-            <div class="row"><h3>杠铃卧推</h3><button class="chip active" data-toggle-done>已完成</button></div>
-            <p>4 组 · 8-10 次 · 休息 90 秒</p>
-          </article>
-          <article class="exercise done" data-workout-exercise>
-            <div class="row"><h3>上斜哑铃卧推</h3><button class="chip active" data-toggle-done>已完成</button></div>
-            <p>3 组 · 10-12 次 · 休息 75 秒</p>
-          </article>
-          <article class="exercise done" data-workout-exercise>
-            <div class="row"><h3>坐姿肩推</h3><button class="chip active" data-toggle-done>已完成</button></div>
-            <p>4 组 · 8-10 次 · 休息 90 秒</p>
-          </article>
-          <article class="exercise" data-workout-exercise>
-            <div class="row"><h3>侧平举</h3><button class="btn secondary" data-toggle-done>完成</button></div>
-            <p>4 组 · 12-15 次 · 休息 60 秒</p>
-          </article>
-          <article class="exercise" data-workout-exercise>
-            <div class="row"><h3>绳索下压</h3><button class="btn secondary" data-toggle-done>完成</button></div>
-            <p>3 组 · 10-12 次 · 休息 60 秒</p>
-          </article>
-        </div>
-
-        <div class="card stack" style="margin-top:12px">
-          <label>训练备注<textarea placeholder="记录今天的状态、重量变化或不适感"></textarea></label>
-          <button class="btn primary full" id="finishWorkoutBtn">完成训练</button>
-        </div>
+        <div class="card stack"><h3>杠铃卧推</h3><p>4 组 · 8-10 次 · 休息 90 秒</p><button class="btn-secondary">已完成</button></div>
+        <div class="card stack"><h3>坐姿肩推</h3><p>4 组 · 8-10 次 · 休息 90 秒</p><button class="btn-secondary">完成</button></div>
+        <button class="btn-primary" style="width:100%;margin-top:12px" data-confirm="仍然保存训练？||还有 2 个动作未完成。可以继续训练，也可以按当前完成状态保存记录。">完成训练</button>
       </section>
 
       <section class="screen" id="history">
-        <div class="screen-head">
-          <div class="head-title">
-            <p class="small">训练回顾</p>
-            <h2>历史记录</h2>
-          </div>
-          <button class="btn secondary" data-toast="筛选项已展开">筛选</button>
-        </div>
-
-        <div class="chip-row selectable" data-select-one="history">
-          <button class="chip active" data-history-filter="all">全部</button>
-          <button class="chip" data-history-filter="week">本周</button>
-          <button class="chip" data-history-filter="month">本月</button>
-        </div>
-
-        <div class="list" style="margin-top:12px">
-          <article class="list-item history-item" data-history="week month">
-            <div class="record-row">
-              <div>
-                <h3>Day 1 胸肩三头</h3>
-                <p class="small">2026-06-25 · 62 分钟 · 5/5 完成</p>
-              </div>
-              <button class="btn secondary" data-screen="record">详情</button>
-            </div>
-            <p>卧推进步明显，肩推最后一组略吃力。</p>
-          </article>
-          <article class="list-item history-item" data-history="week month">
-            <div class="record-row">
-              <div>
-                <h3>Day 2 背二头</h3>
-                <p class="small">2026-06-24 · 58 分钟 · 5/5 完成</p>
-              </div>
-              <button class="btn danger" data-confirm="删除记录||删除后无法恢复，但不会影响训练计划。||danger">删除</button>
-            </div>
-          </article>
-          <article class="list-item history-item" data-history="month">
-            <div class="record-row">
-              <div>
-                <h3>Day 3 腿臀</h3>
-                <p class="small">2026-06-16 · 66 分钟 · 4/5 完成</p>
-              </div>
-              <button class="btn secondary" data-screen="record">详情</button>
-            </div>
-          </article>
-        </div>
+        <div class="head"><div><p>训练回顾</p><h2>历史记录</h2></div></div>
+        <div class="chip-row"><span class="chip active">全部</span><span class="chip">本周</span><span class="chip">本月</span></div>
+        <article class="card stack" style="margin-top:12px"><h3>Day 1 胸肩三头</h3><p>2026-06-25 · 62 分钟 · 动作快照已保存</p><div class="grid-2"><button class="btn-secondary" data-screen="record">详情</button><button class="btn-danger" data-confirm="删除记录||删除后无法恢复，但不会影响训练计划。">删除</button></div></article>
       </section>
 
       <section class="screen" id="record">
-        <div class="screen-head">
-          <button class="icon-btn" data-screen="history" aria-label="返回">‹</button>
-          <div class="head-title">
-            <p class="small">训练记录详情</p>
-            <h3>Day 1 胸肩三头</h3>
-          </div>
-          <button class="icon-btn" data-confirm="删除记录||删除后无法恢复，但不会影响训练计划。||danger" aria-label="删除">⌫</button>
-        </div>
-
-        <div class="hero">
-          <p class="small">2026-06-25 19:30 · 62 分钟</p>
-          <h2>完成度 100%</h2>
-          <div class="progress" style="--progress:100%"><span></span></div>
-        </div>
-        <div class="card stack" style="margin-top:12px">
-          <h3>动作快照</h3>
-          <div class="exercise done"><h3>杠铃卧推</h3><p>4 组 · 8-10 次 · 完成</p></div>
-          <div class="exercise done"><h3>上斜哑铃卧推</h3><p>3 组 · 10-12 次 · 完成</p></div>
-          <div class="exercise done"><h3>坐姿肩推</h3><p>4 组 · 8-10 次 · 完成</p></div>
-        </div>
+        <div class="head"><button class="btn-ghost" data-screen="history">返回</button><h3>记录详情</h3></div>
+        <div class="card stack"><h2>Day 1 胸肩三头</h2><p>2026-06-25 · 62 分钟</p><p>记录使用动作快照，不受计划后续编辑影响。</p></div>
       </section>
 
       <section class="screen" id="ai">
-        <div class="screen-head">
-          <div class="head-title">
-            <p class="small">可选能力</p>
-            <h2>AI 生成计划</h2>
-          </div>
-          <button class="btn secondary" data-screen="settings">设置 Key</button>
-        </div>
-
-        <div class="notice">API Key 建议仅本机加密保存。生成结果应先进入预览，确认后再保存为新计划，避免覆盖用户已有数据。</div>
-
+        <div class="head"><div><p>可选能力</p><h2>AI 生成计划</h2></div><button class="btn-secondary" data-screen="settings">设置 Key</button></div>
+        <div class="notice">生成结果先进入预览，保存前会再次校验字段，不会覆盖已有计划。</div>
         <div class="card stack" style="margin-top:12px">
-          <label>健身目标
-            <select id="aiGoal"><option>增肌</option><option>减脂</option><option>塑形</option><option>力量提升</option></select>
-          </label>
-          <div class="grid-2">
-            <label>每周天数<input id="aiDays" value="4" inputmode="numeric" /></label>
-            <label>每次分钟<input id="aiMinutes" value="60" inputmode="numeric" /></label>
-          </div>
-          <label>经验水平
-            <select><option>中级</option><option>新手</option><option>高级</option></select>
-          </label>
-          <label>可用器械<textarea>哑铃、杠铃、健身房器械</textarea></label>
-          <label>避开动作或受限部位<textarea placeholder="例如膝盖不适，避免深蹲"></textarea></label>
-          <button class="btn primary full" id="generateAiBtn">生成并预览</button>
-        </div>
-
-        <div class="card stack hide" id="aiPreview" style="margin-top:12px">
-          <div class="card-head" style="margin-bottom:0">
-            <h3>生成结果预览</h3>
-            <span class="chip soft">不会覆盖</span>
-          </div>
-          <p id="aiPreviewText">已生成一份 4 天/周、每次 60 分钟的增肌计划。</p>
-          <div class="meta"><span>Day 1 推</span><span>Day 2 拉</span><span>Day 3 腿</span><span>Day 4 全身</span></div>
-          <div class="grid-2">
-            <button class="btn secondary" data-screen="edit">继续编辑</button>
-            <button class="btn primary" data-toast="AI 计划已保存为新计划">保存计划</button>
-          </div>
+          <label>目标<select><option>增肌</option><option>减脂</option></select></label>
+          <div class="grid-2"><label>每周天数<input value="4" /></label><label>每次分钟<input value="60" /></label></div>
+          <button class="btn-primary" data-toast="生成完成，请预览后保存">生成并预览</button>
+          <button class="btn-secondary" data-screen="edit">继续编辑预览</button>
         </div>
       </section>
 
       <section class="screen" id="settings">
-        <div class="screen-head">
-          <div class="head-title">
-            <p class="small">本机配置</p>
-            <h2>设置</h2>
-          </div>
-        </div>
-
+        <div class="head"><div><p>本机配置</p><h2>设置</h2></div></div>
         <div class="card stack">
-          <div class="card-head" style="margin-bottom:0">
-            <h3>DeepSeek API Key</h3>
-            <button class="btn ghost" id="toggleKeyBtn">显示</button>
-          </div>
-          <p class="small">仅保存在本机，建议后续升级为加密存储和权限说明。</p>
-          <label>API Key<input id="apiKeyInput" type="password" value="sk-1234567890abcdef" /></label>
-          <div class="grid-2">
-            <button class="btn secondary" data-toast="API Key 已保存">保存</button>
-            <button class="btn danger" data-confirm="清空 API Key||清空后 AI 生成计划将不可用。||danger">清空</button>
-          </div>
+          <h3>DeepSeek API Key</h3>
+          <p>Key 仅保存在本机，卸载 App 后会丢失。</p>
+          <input type="password" value="sk-••••••••" />
+          <div class="grid-2"><button class="btn-primary" data-toast="设置已保存">保存</button><button class="btn-danger" data-confirm="清空 API Key||清空后 AI 生成计划将不可用。">清空</button></div>
         </div>
-
-        <div class="card stack" style="margin-top:12px">
-          <h3>数据备份</h3>
-          <p>导出 JSON 会包含计划、训练日、动作、历史记录和导出时间。导入时只新增，不覆盖已有数据。</p>
-          <div class="grid-2">
-            <button class="btn secondary" data-toast="已生成备份文件预览">导出</button>
-            <button class="btn secondary" data-confirm="导入备份||导入前将展示字段校验和风险说明。||primary">导入</button>
-          </div>
-        </div>
+        <div class="card stack" style="margin-top:12px"><h3>本地备份</h3><p>导入只新增，不覆盖已有数据。</p><button class="btn-secondary" data-confirm="确认导入备份？||导入会新增计划和记录，不会覆盖现有数据。">确认导入</button></div>
       </section>
 
-      <nav class="bottom-nav" aria-label="Bottom navigation">
-        <button class="nav-item active" data-nav="home"><span>⌂</span><span>首页</span></button>
-        <button class="nav-item" data-nav="plans"><span>▤</span><span>计划</span></button>
-        <button class="nav-item" data-nav="history"><span>◷</span><span>记录</span></button>
-        <button class="nav-item" data-nav="ai"><span>✦</span><span>AI</span></button>
-        <button class="nav-item" data-nav="settings"><span>⚙</span><span>设置</span></button>
+      <nav class="bottom-nav">
+        <button class="nav active" data-nav="home"><span>⌂</span><span>首页</span></button>
+        <button class="nav" data-nav="plans"><span>▤</span><span>计划</span></button>
+        <button class="nav" data-nav="history"><span>◷</span><span>记录</span></button>
+        <button class="nav" data-nav="ai"><span>AI</span><span>AI</span></button>
+        <button class="nav" data-nav="settings"><span>⚙</span><span>设置</span></button>
       </nav>
-
-      <div class="toast" id="toast">操作成功</div>
-
-      <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <div class="modal">
-          <div class="stack" style="gap:6px">
-            <h3 id="modalTitle">确认操作</h3>
-            <p id="modalDesc">请确认是否继续。</p>
-          </div>
-          <div class="grid-2">
-            <button class="btn secondary" id="modalCancel">取消</button>
-            <button class="btn primary" id="modalOk">确认</button>
-          </div>
-        </div>
-      </div>
+      <div class="toast" id="toast"></div>
+      <div class="dialog" id="dialog"><h3 id="dialogTitle"></h3><p id="dialogText"></p><div class="grid-2"><button class="btn-ghost" id="dialogCancel">取消</button><button class="btn-primary" id="dialogConfirm">确认</button></div></div>
     </section>
   </main>
-
   <script>
     const screens = document.querySelectorAll(".screen");
-    const navItems = document.querySelectorAll(".nav-item");
+    const navItems = document.querySelectorAll(".nav");
     const toast = document.getElementById("toast");
-    const modalBackdrop = document.getElementById("modalBackdrop");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalDesc = document.getElementById("modalDesc");
-    const modalOk = document.getElementById("modalOk");
-    const modalCancel = document.getElementById("modalCancel");
-    let toastTimer;
-    let confirmCallback = null;
-
-    const screenToNav = {
-      home: "home",
-      plans: "plans",
-      detail: "plans",
-      edit: "plans",
-      workout: "home",
-      history: "history",
-      record: "history",
-      ai: "ai",
-      settings: "settings"
-    };
-
+    const dialog = document.getElementById("dialog");
+    let timer;
     function showScreen(id) {
-      screens.forEach(screen => screen.classList.toggle("active", screen.id === id));
-      const navId = screenToNav[id] || id;
-      navItems.forEach(item => item.classList.toggle("active", item.dataset.nav === navId));
-      const active = document.getElementById(id);
-      if (active) active.scrollTop = 0;
+      screens.forEach(s => s.classList.toggle("active", s.id === id));
+      navItems.forEach(n => n.classList.toggle("active", n.dataset.nav === id));
     }
-
-    function showToast(message) {
-      toast.textContent = message;
+    function showToast(text) {
+      toast.textContent = text;
       toast.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove("show"), 1900);
+      clearTimeout(timer);
+      timer = setTimeout(() => toast.classList.remove("show"), 1800);
     }
-
-    function openConfirm(title, desc, variant, callback) {
-      modalTitle.textContent = title;
-      modalDesc.textContent = desc;
-      modalOk.className = "btn " + (variant === "danger" ? "danger" : "primary");
-      confirmCallback = callback || (() => showToast("操作已确认"));
-      modalBackdrop.classList.add("show");
+    function openConfirm(raw) {
+      const [title, text] = raw.split("||");
+      document.getElementById("dialogTitle").textContent = title;
+      document.getElementById("dialogText").textContent = text;
+      dialog.classList.add("show");
     }
-
-    function closeConfirm() {
-      modalBackdrop.classList.remove("show");
-      confirmCallback = null;
-    }
-
-    modalCancel.addEventListener("click", closeConfirm);
-    modalBackdrop.addEventListener("click", event => {
-      if (event.target === modalBackdrop) closeConfirm();
-    });
-    modalOk.addEventListener("click", () => {
-      if (confirmCallback) confirmCallback();
-      closeConfirm();
-    });
-
     document.addEventListener("click", event => {
-      const target = event.target.closest("button");
-      if (!target) return;
-
-      if (target.dataset.nav) {
-        showScreen(target.dataset.nav);
-        return;
-      }
-      if (target.dataset.screen) showScreen(target.dataset.screen);
-      if (target.dataset.toast) showToast(target.dataset.toast);
-      if (target.dataset.confirm) {
-        const [title, desc, variant] = target.dataset.confirm.split("||");
-        openConfirm(title, desc, variant, () => showToast(`${title}已确认`));
-      }
+      const button = event.target.closest("button");
+      if (!button) return;
+      if (button.dataset.nav) showScreen(button.dataset.nav);
+      if (button.dataset.screen) showScreen(button.dataset.screen);
+      if (button.dataset.toast) showToast(button.dataset.toast);
+      if (button.dataset.confirm) openConfirm(button.dataset.confirm);
     });
-
-    document.querySelectorAll(".selectable").forEach(group => {
-      group.addEventListener("click", event => {
-        const chip = event.target.closest(".chip");
-        if (!chip) return;
-        group.querySelectorAll(".chip").forEach(item => item.classList.remove("active"));
-        chip.classList.add("active");
-      });
-    });
-
-    document.getElementById("currentSwitch").addEventListener("click", event => {
-      const sw = event.currentTarget;
-      sw.classList.toggle("on");
-      sw.setAttribute("aria-pressed", sw.classList.contains("on") ? "true" : "false");
-      showToast(sw.classList.contains("on") ? "已设为当前计划" : "已取消当前计划");
-    });
-
-    const planSearch = document.getElementById("planSearch");
-    const planCards = document.querySelectorAll(".plan-card");
-    const planEmpty = document.getElementById("planEmpty");
-    let planFilter = "all";
-
-    function applyPlanFilter() {
-      const keyword = planSearch.value.trim().toLowerCase();
-      let visibleCount = 0;
-      planCards.forEach(card => {
-        const tags = card.dataset.tags.toLowerCase();
-        const matchKeyword = !keyword || tags.includes(keyword);
-        const matchFilter = planFilter === "all" || tags.includes(planFilter);
-        const visible = matchKeyword && matchFilter;
-        card.classList.toggle("hide", !visible);
-        if (visible) visibleCount += 1;
-      });
-      planEmpty.classList.toggle("hide", visibleCount !== 0);
-    }
-    planSearch.addEventListener("input", applyPlanFilter);
-    document.querySelector('[data-filter-group="plans"]').addEventListener("click", event => {
-      const chip = event.target.closest(".chip");
-      if (!chip) return;
-      planFilter = chip.dataset.filter;
-      document.querySelectorAll('[data-filter-group="plans"] .chip').forEach(item => item.classList.remove("active"));
-      chip.classList.add("active");
-      applyPlanFilter();
-    });
-
-    const dayTabs = document.getElementById("dayTabs");
-    const addDayBtn = document.getElementById("addDayBtn");
-    const addDayTab = document.getElementById("addDayTab");
-    const dayName = document.getElementById("dayName");
-    let dayCount = 2;
-
-    function selectDay(tab) {
-      dayTabs.querySelectorAll(".day-tab").forEach(item => item.classList.remove("active"));
-      tab.classList.add("active");
-      const strong = tab.querySelector("strong").textContent;
-      const span = tab.querySelector("span").textContent;
-      dayName.value = `${strong} ${span}`.trim();
-      showToast(`已切换到 ${strong}`);
-    }
-
-    function addDay() {
-      dayCount += 1;
-      const tab = document.createElement("button");
-      tab.className = "day-tab";
-      tab.dataset.dayIndex = dayCount - 1;
-      tab.innerHTML = `<strong>Day ${dayCount}</strong><span>新训练日</span>`;
-      dayTabs.insertBefore(tab, addDayTab);
-      selectDay(tab);
-      showToast(`已添加 Day ${dayCount}`);
-    }
-    addDayBtn.addEventListener("click", addDay);
-    addDayTab.addEventListener("click", addDay);
-    dayTabs.addEventListener("click", event => {
-      const tab = event.target.closest(".day-tab:not(.add)");
-      if (tab) selectDay(tab);
-    });
-    dayName.addEventListener("input", () => {
-      const activeTab = dayTabs.querySelector(".day-tab.active");
-      if (!activeTab) return;
-      const parts = dayName.value.trim().split(/\s+/);
-      activeTab.querySelector("span").textContent = parts.slice(2).join(" ") || "未命名";
-    });
-
-    const exerciseList = document.getElementById("exerciseList");
-    const exerciseCountText = document.getElementById("exerciseCountText");
-    function refreshExerciseTitles() {
-      const cards = [...exerciseList.querySelectorAll("[data-exercise]")];
-      cards.forEach((card, index) => {
-        card.querySelector("h3").textContent = `动作 ${index + 1}`;
-      });
-      exerciseCountText.textContent = `${cards.length} 个动作 · 按执行顺序排列`;
-    }
-    function createExercise() {
-      const card = document.createElement("article");
-      card.className = "exercise active";
-      card.dataset.exercise = "";
-      card.innerHTML = `
-        <div class="row"><h3>动作</h3><span class="small muted">新增动作</span></div>
-        <label>动作名称<input placeholder="例如 坐姿肩推" data-required="true" /></label>
-        <div class="compact-grid">
-          <label>部位<input placeholder="肩" /></label>
-          <label>组数<input value="3" inputmode="numeric" /></label>
-          <label>次数<input value="10-12" /></label>
-        </div>
-        <div class="grid-2">
-          <label>重量<input placeholder="可为空" /></label>
-          <label>休息秒<input value="60" inputmode="numeric" /></label>
-        </div>
-        <label>备注<textarea placeholder="可选"></textarea></label>
-        <div class="mini-actions">
-          <button data-move="up">上移</button>
-          <button data-move="down">下移</button>
-          <button class="danger-link" data-remove-exercise>删除</button>
-        </div>`;
-      return card;
-    }
-    function addExercise() {
-      const card = createExercise();
-      exerciseList.appendChild(card);
-      setTimeout(() => card.classList.remove("active"), 900);
-      refreshExerciseTitles();
-      showToast("已添加动作，请补充动作名称");
-    }
-    document.getElementById("addExerciseBtn").addEventListener("click", addExercise);
-    document.getElementById("addExerciseBlock").addEventListener("click", addExercise);
-    exerciseList.addEventListener("click", event => {
-      const card = event.target.closest("[data-exercise]");
-      if (!card) return;
-      if (event.target.closest("[data-remove-exercise]")) {
-        openConfirm("删除动作", "删除后该动作会从当前训练日移除。", "danger", () => {
-          card.remove();
-          refreshExerciseTitles();
-          showToast("动作已删除");
-        });
-      }
-      const moveBtn = event.target.closest("[data-move]");
-      if (moveBtn) {
-        if (moveBtn.dataset.move === "up" && card.previousElementSibling) exerciseList.insertBefore(card, card.previousElementSibling);
-        if (moveBtn.dataset.move === "down" && card.nextElementSibling) exerciseList.insertBefore(card.nextElementSibling, card);
-        refreshExerciseTitles();
-        showToast("动作顺序已调整");
-      }
-    });
-
-    function validatePlan() {
-      let ok = true;
-      const nameField = document.getElementById("planNameField");
-      const weekField = document.getElementById("weekCountField");
-      const minuteField = document.getElementById("minuteField");
-      const planName = document.getElementById("planName").value.trim();
-      const week = Number(document.getElementById("weekCount").value);
-      const minute = Number(document.getElementById("minuteCount").value);
-      nameField.classList.toggle("field-error", !planName);
-      weekField.classList.toggle("field-error", !(week >= 1 && week <= 7));
-      minuteField.classList.toggle("field-error", !(minute >= 10 && minute <= 240));
-      ok = !!planName && week >= 1 && week <= 7 && minute >= 10 && minute <= 240;
-      const emptyExercise = [...exerciseList.querySelectorAll("[data-required]")].find(input => !input.value.trim());
-      if (emptyExercise) {
-        emptyExercise.focus();
-        ok = false;
-        showToast("请补全动作名称");
-      }
-      return ok;
-    }
-
-    function previewPlan() {
-      if (!validatePlan()) return;
-      const planName = document.getElementById("planName").value.trim();
-      const week = document.getElementById("weekCount").value;
-      const minute = document.getElementById("minuteCount").value;
-      const exerciseCount = exerciseList.querySelectorAll("[data-exercise]").length;
-      openConfirm("计划预览", `${planName}：${week} 天/周，每次 ${minute} 分钟；当前训练日包含 ${exerciseCount} 个动作。`, "primary", () => showToast("预览确认完成"));
-    }
-    document.getElementById("previewPlanBtn").addEventListener("click", previewPlan);
-    document.getElementById("previewPlanBtn2").addEventListener("click", previewPlan);
-    document.getElementById("savePlanBtn").addEventListener("click", () => {
-      if (!validatePlan()) return;
-      showToast("计划已保存");
-      showScreen("detail");
-    });
-
-    function updateWorkoutProgress() {
-      const items = [...document.querySelectorAll("[data-workout-exercise]")];
-      const done = items.filter(item => item.classList.contains("done")).length;
-      const total = items.length;
-      const pct = Math.round((done / total) * 100);
-      document.getElementById("workoutTitle").textContent = `${done}/${total} 已完成`;
-      document.getElementById("workoutProgress").style.setProperty("--progress", `${pct}%`);
-      document.getElementById("finishWorkoutBtn").textContent = done === total ? "完成训练" : `完成训练（还有 ${total - done} 个未完成）`;
-    }
-    document.getElementById("workoutList").addEventListener("click", event => {
-      const btn = event.target.closest("[data-toggle-done]");
-      if (!btn) return;
-      const card = btn.closest("[data-workout-exercise]");
-      card.classList.toggle("done");
-      const done = card.classList.contains("done");
-      btn.className = done ? "chip active" : "btn secondary";
-      btn.textContent = done ? "已完成" : "完成";
-      updateWorkoutProgress();
-    });
-    document.getElementById("finishWorkoutBtn").addEventListener("click", () => {
-      openConfirm("完成训练", "系统将保存当前动作完成状态、训练备注和本次训练快照。", "primary", () => {
-        showToast("训练记录已保存");
-        showScreen("history");
-      });
-    });
-
-    document.querySelector('[data-select-one="history"]').addEventListener("click", event => {
-      const chip = event.target.closest("[data-history-filter]");
-      if (!chip) return;
-      const filter = chip.dataset.historyFilter;
-      document.querySelectorAll(".history-item").forEach(item => {
-        item.classList.toggle("hide", filter !== "all" && !item.dataset.history.includes(filter));
-      });
-    });
-
-    document.getElementById("generateAiBtn").addEventListener("click", () => {
-      const goal = document.getElementById("aiGoal").value;
-      const days = document.getElementById("aiDays").value;
-      const minutes = document.getElementById("aiMinutes").value;
-      document.getElementById("aiPreviewText").textContent = `已生成一份 ${days} 天/周、每次 ${minutes} 分钟的${goal}计划。`;
-      document.getElementById("aiPreview").classList.remove("hide");
-      showToast("生成完成，请先预览再保存");
-    });
-
-    document.getElementById("toggleKeyBtn").addEventListener("click", event => {
-      const input = document.getElementById("apiKeyInput");
-      const visible = input.type === "text";
-      input.type = visible ? "password" : "text";
-      event.currentTarget.textContent = visible ? "显示" : "隐藏";
-    });
+    document.getElementById("dialogCancel").addEventListener("click", () => dialog.classList.remove("show"));
+    document.getElementById("dialogConfirm").addEventListener("click", () => { dialog.classList.remove("show"); showToast("操作已确认"); });
   </script>
 </body>
 </html>
