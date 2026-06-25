@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -64,6 +65,25 @@ class AiPlanViewModelTest {
 
         assertEquals("三天新手训练计划", workoutRepository.savedPlan?.name)
         assertEquals(100L, viewModel.uiState.value.savedPlanId)
+        assertEquals("已保存为新计划", viewModel.uiState.value.message)
+    }
+
+    @Test
+    fun saveGeneratedPlan_withInvalidPreview_showsSpecificError() = runTest {
+        val workoutRepository = FakeWorkoutPlanRepository()
+        val viewModel = AiPlanViewModel(
+            aiPlanRepository = FakeAiPlanRepository(Result.success(samplePlan)),
+            workoutPlanRepository = workoutRepository
+        )
+
+        viewModel.generatePlan()
+        advanceUntilIdle()
+        viewModel.updatePreviewPlan { copy(name = "") }
+        viewModel.saveGeneratedPlan()
+        advanceUntilIdle()
+
+        assertEquals("计划名称不能为空", viewModel.uiState.value.errorMessage)
+        assertNull(workoutRepository.savedPlan)
     }
 
     @Test

@@ -154,7 +154,7 @@ class AiPlanViewModel(
             updateState { copy(isSaving = true, errorMessage = null, message = null) }
             workoutPlanRepository.savePlan(plan.getOrThrow())
                 .onSuccess { planId ->
-                    updateState { copy(isSaving = false, savedPlanId = planId, message = "AI 计划已保存") }
+                    updateState { copy(isSaving = false, savedPlanId = planId, message = "已保存为新计划") }
                 }
                 .onFailure { throwable ->
                     updateState { copy(isSaving = false, errorMessage = throwable.message ?: "保存计划失败") }
