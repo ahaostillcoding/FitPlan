@@ -5,11 +5,11 @@ enum class TopLevelDestination(
     val label: String,
     val iconLabel: String
 ) {
-    Home("home", "首页", "今"),
-    Plans("plans", "计划", "练"),
-    History("history", "记录", "记"),
+    Home("home", "首页", "⌂"),
+    Plans("plans", "计划", "▤"),
+    History("history", "记录", "◷"),
     Ai("ai", "AI", "AI"),
-    Settings("settings", "设置", "设")
+    Settings("settings", "设置", "⚙")
 }
 
 object FitPlanRoutes {
