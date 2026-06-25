@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.fitplan.app.domain.model.Exercise
+import com.fitplan.app.ui.common.ConfirmDialog
 import com.fitplan.app.ui.common.ErrorState
 import com.fitplan.app.ui.common.LoadingState
 import com.fitplan.app.ui.common.ScreenHeader
@@ -49,6 +50,8 @@ fun WorkoutSessionScreen(
         onStartRest = viewModel::startRestTimer,
         onStopRest = viewModel::stopRestTimer,
         onFinish = viewModel::finishWorkout,
+        onConfirmIncompleteFinish = viewModel::confirmFinishWorkout,
+        onCancelIncompleteFinish = viewModel::cancelIncompleteFinish,
         modifier = modifier
     )
 }
@@ -64,6 +67,8 @@ private fun WorkoutSessionContent(
     onStartRest: (Long, Int) -> Unit,
     onStopRest: () -> Unit,
     onFinish: () -> Unit,
+    onConfirmIncompleteFinish: () -> Unit,
+    onCancelIncompleteFinish: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (state.isLoading) {
@@ -80,6 +85,16 @@ private fun WorkoutSessionContent(
         0f
     } else {
         state.completedExerciseCount.toFloat() / state.totalExerciseCount.toFloat()
+    }
+    if (state.showIncompleteFinishConfirm) {
+        ConfirmDialog(
+            title = "仍有动作未完成",
+            message = "还有 ${state.incompleteExerciseCount} 个动作未勾选完成。你可以继续训练，也可以仍然保存本次记录。",
+            confirmText = "仍然保存",
+            dismissText = "继续训练",
+            onConfirm = onConfirmIncompleteFinish,
+            onDismiss = onCancelIncompleteFinish
+        )
     }
 
     LazyColumn(

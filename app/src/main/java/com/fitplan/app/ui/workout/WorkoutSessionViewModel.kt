@@ -39,12 +39,14 @@ data class WorkoutSessionUiState(
     val restoredFromDraft: Boolean = false,
     val activeRestExerciseId: Long? = null,
     val restSecondsRemaining: Int = 0,
+    val showIncompleteFinishConfirm: Boolean = false,
     val message: String? = null,
     val errorMessage: String? = null,
     val finishedRecordId: Long? = null
 ) {
     val totalExerciseCount: Int = day?.exercises?.size ?: 0
     val completedExerciseCount: Int = exerciseProgress.values.count { it.isCompleted }
+    val incompleteExerciseCount: Int = (totalExerciseCount - completedExerciseCount).coerceAtLeast(0)
     val progressText: String = "$completedExerciseCount/$totalExerciseCount 已完成"
 }
 
@@ -144,15 +146,39 @@ class WorkoutSessionViewModel(
 
     fun finishWorkout() {
         val state = uiState.value
+        if (state.incompleteExerciseCount > 0) {
+            _uiState.update {
+                it.copy(
+                    showIncompleteFinishConfirm = true,
+                    message = null,
+                    errorMessage = null
+                )
+            }
+            return
+        }
+        saveWorkout(state)
+    }
+
+    fun confirmFinishWorkout() {
+        val state = uiState.value.copy(showIncompleteFinishConfirm = false)
+        _uiState.update { it.copy(showIncompleteFinishConfirm = false) }
+        saveWorkout(state)
+    }
+
+    fun cancelIncompleteFinish() {
+        _uiState.update { it.copy(showIncompleteFinishConfirm = false) }
+    }
+
+    private fun saveWorkout(state: WorkoutSessionUiState) {
         val plan = state.plan
         val day = state.day
         if (plan == null || day == null) {
-            _uiState.update { it.copy(errorMessage = "训练内容还没有加载完成") }
+            _uiState.update { it.copy(showIncompleteFinishConfirm = false, errorMessage = "训练内容还没有加载完成") }
             return
         }
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true, message = null, errorMessage = null) }
+            _uiState.update { it.copy(isSaving = true, showIncompleteFinishConfirm = false, message = null, errorMessage = null) }
             val now = System.currentTimeMillis()
             val duration = max(1, ((now - state.startedAt) / 60_000L).toInt())
             val record = WorkoutRecord(
@@ -188,7 +214,11 @@ class WorkoutSessionViewModel(
                 }
                 .onFailure { error ->
                     _uiState.update {
-                        it.copy(isSaving = false, errorMessage = error.message ?: "保存训练记录失败")
+                        it.copy(
+                            isSaving = false,
+                            showIncompleteFinishConfirm = false,
+                            errorMessage = error.message ?: "保存训练记录失败"
+                        )
                     }
                 }
         }

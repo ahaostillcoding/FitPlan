@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -43,6 +44,7 @@ class WorkoutSessionViewModelTest {
         advanceUntilIdle()
 
         viewModel.updateCompleted(100, true)
+        viewModel.updateCompleted(101, true)
         viewModel.updateExerciseNotes(100, "动作稳定")
         viewModel.updateSessionNotes("状态不错")
         viewModel.finishWorkout()
@@ -55,6 +57,38 @@ class WorkoutSessionViewModelTest {
         assertEquals("动作稳定", record?.exercises?.first()?.actualNotes)
         assertEquals(300L, viewModel.uiState.value.finishedRecordId)
         assertEquals("", settingsRepository.current.workoutDraftJson)
+    }
+
+    @Test
+    fun finishWorkoutWithIncompleteExercisesRequiresConfirmation() = runTest {
+        val plan = samplePlan()
+        val planRepository = FakeWorkoutPlanRepository(listOf(plan))
+        val recordRepository = FakeWorkoutRecordRepository()
+        val settingsRepository = FakeSettingsRepository()
+        val viewModel = WorkoutSessionViewModel(
+            planId = 1,
+            dayId = 10,
+            planRepository = planRepository,
+            recordRepository = recordRepository,
+            settingsRepository = settingsRepository
+        )
+        advanceUntilIdle()
+
+        viewModel.updateCompleted(100, true)
+        viewModel.finishWorkout()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.showIncompleteFinishConfirm)
+        assertEquals(1, viewModel.uiState.value.incompleteExerciseCount)
+        assertNull(recordRepository.savedRecord)
+
+        viewModel.confirmFinishWorkout()
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.showIncompleteFinishConfirm)
+        assertEquals(300L, viewModel.uiState.value.finishedRecordId)
+        assertTrue(recordRepository.savedRecord?.exercises?.first()?.isCompleted == true)
+        assertFalse(recordRepository.savedRecord?.exercises?.last()?.isCompleted == true)
     }
 
     @Test
