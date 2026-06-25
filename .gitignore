@@ -5,6 +5,9 @@
 local-toolchain/
 build/
 local.properties
+signing.properties
+*.jks
+*.keystore
 *.iml
 captures/
 externalNativeBuild/

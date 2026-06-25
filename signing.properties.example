@@ -1,0 +1,6 @@
+# Copy this file to signing.properties and fill in local values.
+# Do not commit signing.properties, keystores, or passwords.
+storeFile=D:/private-keystores/fitplan-release.jks
+storePassword=change-me
+keyAlias=fitplan
+keyPassword=change-me
