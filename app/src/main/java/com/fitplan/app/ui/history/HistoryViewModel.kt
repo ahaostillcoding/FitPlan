@@ -50,11 +50,7 @@ class HistoryViewModel(
                 isLoading = false,
                 selectedFilter = filter,
                 records = filteredRecords,
-                emptyMessage = if (records.isEmpty()) {
-                    "还没有训练记录"
-                } else {
-                    "当前筛选没有训练记录"
-                }
+                emptyMessage = if (records.isEmpty()) "还没有训练记录" else "当前筛选没有训练记录"
             )
         }
     }.stateIn(

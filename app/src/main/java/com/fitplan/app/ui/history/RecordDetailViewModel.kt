@@ -17,11 +17,7 @@ class RecordDetailViewModel(
 ) : ViewModel() {
     val uiState: StateFlow<UiState<WorkoutRecord>> = repository.observeRecord(recordId)
         .map { record ->
-            if (record == null) {
-                UiState.Empty("未找到训练记录")
-            } else {
-                UiState.Content(record)
-            }
+            if (record == null) UiState.Empty("未找到训练记录") else UiState.Content(record)
         }
         .stateIn(
             scope = viewModelScope,
