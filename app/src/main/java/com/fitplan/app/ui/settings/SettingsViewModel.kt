@@ -8,10 +8,14 @@ import com.fitplan.app.data.repository.BackupPreview
 import com.fitplan.app.data.repository.BackupRepository
 import com.fitplan.app.data.repository.DEFAULT_DEEPSEEK_MODEL
 import com.fitplan.app.data.repository.SettingsRepository
+import com.google.gson.JsonParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 data class SettingsUiState(
     val apiKey: String = "",
@@ -22,6 +26,7 @@ data class SettingsUiState(
     val message: String? = null,
     val errorMessage: String? = null,
     val exportJson: String = "",
+    val exportSummary: String? = null,
     val importJson: String = "",
     val importPreview: BackupPreview? = null,
     val isBackupBusy: Boolean = false
@@ -156,6 +161,7 @@ class SettingsViewModel(
                         it.copy(
                             isBackupBusy = false,
                             exportJson = json,
+                            exportSummary = buildExportSummary(json),
                             message = "备份 JSON 已生成"
                         )
                     }
@@ -180,6 +186,18 @@ class SettingsViewModel(
                 errorMessage = null
             )
         }
+    }
+
+    private fun buildExportSummary(json: String): String? {
+        return runCatching {
+            val obj = JsonParser.parseString(json).asJsonObject
+            val version = obj.get("version")?.asInt ?: return null
+            val exportedAt = obj.get("exportedAt")?.asLong ?: return null
+            val formattedTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+                .withZone(ZoneId.systemDefault())
+                .format(Instant.ofEpochMilli(exportedAt))
+            "备份版本 $version · 导出时间 $formattedTime"
+        }.getOrNull()
     }
 
     fun previewImport() {

@@ -112,7 +112,7 @@ private fun SettingsContent(
                     singleLine = true
                 )
                 Text(
-                    "默认使用 deepseek-v4-flash。Key 仅保存在本机 DataStore，后续可升级到加密存储。",
+                    "默认使用 deepseek-v4-flash。Key 仅保存在本机 DataStore；卸载 App 会丢失，后续可升级到加密存储。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -155,7 +155,7 @@ private fun SettingsContent(
             ) {
                 Text("本地备份", style = MaterialTheme.typography.titleLarge)
                 Text(
-                    "导出会生成 JSON 文本；导入会先预览，并作为新计划/新记录写入，不覆盖现有数据。",
+                    "导出会生成 JSON 文本；导入会先预览，并作为新计划/新记录写入，只新增、不覆盖现有数据。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -167,6 +167,9 @@ private fun SettingsContent(
                     Text(if (state.isBackupBusy) "处理中..." else "生成备份 JSON")
                 }
                 if (state.exportJson.isNotBlank()) {
+                    state.exportSummary?.let { summary ->
+                        Text(summary, color = MaterialTheme.colorScheme.primary)
+                    }
                     OutlinedTextField(
                         value = state.exportJson,
                         onValueChange = {},

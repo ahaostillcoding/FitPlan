@@ -100,13 +100,14 @@ class SettingsViewModelTest {
     fun exportBackup_setsJsonAndMessage() = runTest {
         val viewModel = SettingsViewModel(
             FakeSettingsRepository(),
-            FakeBackupRepository(exportJson = """{"version":1}""")
+            FakeBackupRepository(exportJson = """{"version":1,"exportedAt":1760000000000}""")
         )
 
         viewModel.exportBackup()
         advanceUntilIdle()
 
-        assertEquals("""{"version":1}""", viewModel.uiState.value.exportJson)
+        assertEquals("""{"version":1,"exportedAt":1760000000000}""", viewModel.uiState.value.exportJson)
+        assertTrue(viewModel.uiState.value.exportSummary?.startsWith("备份版本 1 · 导出时间") == true)
         assertEquals("备份 JSON 已生成", viewModel.uiState.value.message)
     }
 
