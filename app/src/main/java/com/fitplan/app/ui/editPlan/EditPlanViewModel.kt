@@ -201,7 +201,7 @@ class EditPlanViewModel(
     }
 
     private fun validate(state: EditPlanUiState): String? {
-        if (state.name.isBlank()) return "请输入计划名称"
+        if (state.name.isBlank()) return "计划名称不能为空，请输入计划名称"
         if (state.goal.isBlank()) return "请选择训练目标"
         val frequency = state.frequencyPerWeek.toIntOrNull()
         if (frequency == null || frequency !in 1..7) return "每周训练次数需要在 1-7 之间"
@@ -210,15 +210,28 @@ class EditPlanViewModel(
         state.days.forEachIndexed { dayIndex, day ->
             if (day.dayName.isBlank()) return "请输入第 ${dayIndex + 1} 个训练日名称"
             day.exercises.forEachIndexed { exerciseIndex, exercise ->
-                val label = "第 ${dayIndex + 1} 天第 ${exerciseIndex + 1} 个动作"
-                if (exercise.name.isBlank()) return "$label 需要动作名称"
-                if (exercise.bodyPart.isBlank()) return "$label 需要训练部位"
-                if ((exercise.sets.toIntOrNull() ?: 0) <= 0) return "$label 组数需要大于 0"
-                if (exercise.reps.isBlank()) return "$label 需要次数"
-                if ((exercise.restSeconds.toIntOrNull() ?: -1) < 0) return "$label 休息时间不能小于 0"
+                val label = exerciseLabel(dayIndex, day, exerciseIndex)
+                if (exercise.name.isBlank()) return "$label：动作名称不能为空"
+                if (exercise.bodyPart.isBlank()) return "$label：训练部位不能为空"
+                if ((exercise.sets.toIntOrNull() ?: 0) <= 0) return "$label：组数需要大于 0"
+                if (exercise.reps.isBlank()) return "$label：次数不能为空"
+                val restSeconds = exercise.restSeconds.toIntOrNull()
+                if (restSeconds == null || restSeconds < 0) return "$label：休息时间请输入 0 或更大的数字"
             }
         }
         return null
+    }
+
+    private fun exerciseLabel(dayIndex: Int, day: WorkoutDayForm, exerciseIndex: Int): String {
+        val dayName = day.dayName.trim()
+        val hasDayName = dayName.isNotBlank()
+        val dayLabel = if (hasDayName) {
+            "训练日 ${dayIndex + 1}「$dayName」"
+        } else {
+            "训练日 ${dayIndex + 1}"
+        }
+        val separator = if (hasDayName) "" else " "
+        return "$dayLabel${separator}的动作 ${exerciseIndex + 1}"
     }
 
     private fun EditPlanUiState.toWorkoutPlan(): WorkoutPlan {

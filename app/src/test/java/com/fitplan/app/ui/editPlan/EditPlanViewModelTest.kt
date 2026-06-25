@@ -21,7 +21,41 @@ class EditPlanViewModelTest {
 
         viewModel.save()
 
-        assertEquals("请输入计划名称", viewModel.uiState.value.errorMessage)
+        assertEquals("计划名称不能为空，请输入计划名称", viewModel.uiState.value.errorMessage)
+        assertNull(repository.savedPlan)
+    }
+
+    @Test
+    fun saveWithInvalidExerciseShowsLocatedValidationError() = runTest {
+        val repository = FakeWorkoutPlanRepository()
+        val viewModel = EditPlanViewModel(null, repository)
+
+        viewModel.updateName("三天增肌训练计划")
+        viewModel.updateDayName(0, "Day 1 胸肩三头")
+        viewModel.updateExercise(0, 0) { copy(name = "卧推", bodyPart = "胸", sets = "0") }
+        viewModel.save()
+
+        assertEquals(
+            "训练日 1「Day 1 胸肩三头」的动作 1：组数需要大于 0",
+            viewModel.uiState.value.errorMessage
+        )
+        assertNull(repository.savedPlan)
+    }
+
+    @Test
+    fun saveWithInvalidRestSecondsShowsLocatedValidationError() = runTest {
+        val repository = FakeWorkoutPlanRepository()
+        val viewModel = EditPlanViewModel(null, repository)
+
+        viewModel.updateName("三天增肌训练计划")
+        viewModel.updateDayName(0, "Day 1 胸肩三头")
+        viewModel.updateExercise(0, 0) { copy(name = "卧推", bodyPart = "胸", restSeconds = "abc") }
+        viewModel.save()
+
+        assertEquals(
+            "训练日 1「Day 1 胸肩三头」的动作 1：休息时间请输入 0 或更大的数字",
+            viewModel.uiState.value.errorMessage
+        )
         assertNull(repository.savedPlan)
     }
 
