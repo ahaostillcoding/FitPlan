@@ -202,9 +202,9 @@ class EditPlanViewModel(
 
     private fun validate(state: EditPlanUiState): String? {
         if (state.name.isBlank()) return "请输入计划名称"
-        if (state.goal.isBlank()) return "请输入训练目标"
+        if (state.goal.isBlank()) return "请选择训练目标"
         val frequency = state.frequencyPerWeek.toIntOrNull()
-        if (frequency == null || frequency !in 1..7) return "每周训练次数需为 1-7"
+        if (frequency == null || frequency !in 1..7) return "每周训练次数需要在 1-7 之间"
         val duration = state.estimatedDurationMinutes.toIntOrNull()
         if (duration == null || duration <= 0) return "请输入有效训练时长"
         state.days.forEachIndexed { dayIndex, day ->
@@ -213,7 +213,7 @@ class EditPlanViewModel(
                 val label = "第 ${dayIndex + 1} 天第 ${exerciseIndex + 1} 个动作"
                 if (exercise.name.isBlank()) return "$label 需要动作名称"
                 if (exercise.bodyPart.isBlank()) return "$label 需要训练部位"
-                if ((exercise.sets.toIntOrNull() ?: 0) <= 0) return "$label 组数需大于 0"
+                if ((exercise.sets.toIntOrNull() ?: 0) <= 0) return "$label 组数需要大于 0"
                 if (exercise.reps.isBlank()) return "$label 需要次数"
                 if ((exercise.restSeconds.toIntOrNull() ?: -1) < 0) return "$label 休息时间不能小于 0"
             }
