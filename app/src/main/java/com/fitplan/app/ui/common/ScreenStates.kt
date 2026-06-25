@@ -91,7 +91,7 @@ fun ErrorState(
 @Composable
 fun SectionCard(
     modifier: Modifier = Modifier,
-    content: @Composable Column.() -> Unit
+    content: @Composable () -> Unit
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -101,8 +101,9 @@ fun SectionCard(
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                content = content
-            )
+            ) {
+                content()
+            }
         }
     )
 }

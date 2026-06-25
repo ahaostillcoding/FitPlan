@@ -61,7 +61,7 @@ class SettingsViewModelTest {
         advanceUntilIdle()
 
         assertEquals(
-            "未配置 API Key，AI 生成暂不可用；离线计划和记录不受影响。",
+            "未配置 API Key，AI 生成功能暂不可用；离线计划和记录不受影响。",
             viewModel.uiState.value.apiKeyStatus
         )
     }
@@ -173,6 +173,7 @@ class SettingsViewModelTest {
         }
 
         override suspend fun testConnection(): Result<Unit> = connectionResult
+
         override fun parseWorkoutPlanJson(json: String): Result<WorkoutPlan> {
             return Result.failure(UnsupportedOperationException("Unused"))
         }
