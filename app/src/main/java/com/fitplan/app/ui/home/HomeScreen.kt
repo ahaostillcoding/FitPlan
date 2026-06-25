@@ -84,6 +84,10 @@ fun HomeContent(
                 "本周已练 ${state.weeklyWorkoutCount} 次 · 最近一次 ${formatShortDate(state.lastWorkoutAt)}",
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            Text(
+                "近 7 天 ${state.recent7DayWorkoutCount} 次 · 共 ${state.recent7DayDurationMinutes} 分钟",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
@@ -93,10 +97,14 @@ fun HomeContent(
                     Text("预计 ${plan.estimatedDurationMinutes} 分钟 · ${todayDay?.exercises?.size ?: 0} 个动作")
                     if (todayDay != null) {
                         Text(
-                            "今日默认：${todayDay.dayName}",
+                            "今日训练日：${todayDay.dayName} · 来自首页选择",
                             style = MaterialTheme.typography.titleMedium
                         )
                         if (plan.days.size > 1) {
+                            Text(
+                                "切换训练日后会作为首页默认选择保存到本机。",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 plan.days.forEach { day ->
                                     FilterChip(

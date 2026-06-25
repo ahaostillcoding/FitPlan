@@ -22,6 +22,8 @@ data class HomeUiState(
     val activePlan: WorkoutPlan? = null,
     val selectedWorkoutDayId: Long? = null,
     val weeklyWorkoutCount: Int = 0,
+    val recent7DayWorkoutCount: Int = 0,
+    val recent7DayDurationMinutes: Int = 0,
     val lastWorkoutAt: Long? = null,
     val isEmpty: Boolean = true
 ) {
@@ -37,19 +39,23 @@ class HomeViewModel(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
     private val weekRange = currentWeekRange()
+    private val recent7DayRange = recent7DayRange()
 
     val uiState: StateFlow<HomeUiState> = combine(
         planRepository.observeActivePlan(),
         recordRepository.observeRecordCountBetween(weekRange.first, weekRange.second),
+        recordRepository.observeRecordsBetween(recent7DayRange.first, recent7DayRange.second),
         recordRepository.observeLastRecord(),
         settingsRepository.settings
-    ) { activePlan, weeklyCount, lastRecord, settings ->
+    ) { activePlan, weeklyCount, recentRecords, lastRecord, settings ->
         val selectedDayId = settings.selectedWorkoutDayId
             ?.takeIf { dayId -> activePlan?.days?.any { it.id == dayId } == true }
         HomeUiState(
             activePlan = activePlan,
             selectedWorkoutDayId = selectedDayId,
             weeklyWorkoutCount = weeklyCount,
+            recent7DayWorkoutCount = recentRecords.size,
+            recent7DayDurationMinutes = recentRecords.sumOf { it.durationMinutes },
             lastWorkoutAt = lastRecord?.date,
             isEmpty = activePlan == null
         )
@@ -68,6 +74,21 @@ class HomeViewModel(
             .toEpochMilli()
         val end = LocalDate.now(zone)
             .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+            .atStartOfDay(zone)
+            .toInstant()
+            .toEpochMilli()
+        return start to end
+    }
+
+    private fun recent7DayRange(): Pair<Long, Long> {
+        val zone = ZoneId.systemDefault()
+        val start = LocalDate.now(zone)
+            .minusDays(6)
+            .atStartOfDay(zone)
+            .toInstant()
+            .toEpochMilli()
+        val end = LocalDate.now(zone)
+            .plusDays(1)
             .atStartOfDay(zone)
             .toInstant()
             .toEpochMilli()

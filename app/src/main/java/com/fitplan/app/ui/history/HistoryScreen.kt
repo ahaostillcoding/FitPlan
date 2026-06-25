@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHost
@@ -29,7 +30,6 @@ import com.fitplan.app.domain.model.WorkoutRecord
 import com.fitplan.app.ui.common.EmptyState
 import com.fitplan.app.ui.common.ErrorState
 import com.fitplan.app.ui.common.LoadingState
-import com.fitplan.app.ui.common.UiState
 import com.fitplan.app.ui.common.formatFullDate
 
 @Composable
@@ -53,6 +53,7 @@ fun HistoryScreen(
     HistoryContent(
         state = state,
         onRecordClick = onRecordClick,
+        onFilterSelected = viewModel::selectFilter,
         onDeleteRequest = { pendingDeleteRecord.value = it },
         snackbarHostState = snackbarHostState,
         modifier = modifier
@@ -84,17 +85,17 @@ fun HistoryScreen(
 
 @Composable
 fun HistoryContent(
-    state: UiState<List<WorkoutRecord>>,
+    state: HistoryUiState,
     onRecordClick: (Long) -> Unit,
+    onFilterSelected: (HistoryFilter) -> Unit,
     onDeleteRequest: (WorkoutRecord) -> Unit,
     snackbarHostState: SnackbarHostState? = null,
     modifier: Modifier = Modifier
 ) {
-    when (state) {
-        UiState.Loading -> LoadingState(modifier)
-        is UiState.Empty -> EmptyState(state.message, modifier = modifier)
-        is UiState.Error -> ErrorState(state.message, modifier)
-        is UiState.Content -> Box(modifier = modifier.fillMaxSize()) {
+    when {
+        state.isLoading -> LoadingState(modifier)
+        state.errorMessage != null -> ErrorState(state.errorMessage, modifier)
+        else -> Box(modifier = modifier.fillMaxSize()) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -102,7 +103,23 @@ fun HistoryContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item { Text("训练记录", style = MaterialTheme.typography.headlineMedium) }
-                items(state.data) { record ->
+                item {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        HistoryFilter.entries.forEach { filter ->
+                            FilterChip(
+                                selected = state.selectedFilter == filter,
+                                onClick = { onFilterSelected(filter) },
+                                label = { Text(filter.label) }
+                            )
+                        }
+                    }
+                }
+                if (state.records.isEmpty()) {
+                    item {
+                        EmptyState(state.emptyMessage, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+                items(state.records) { record ->
                     Card(onClick = { onRecordClick(record.id) }, modifier = Modifier.fillMaxWidth()) {
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(record.planName, style = MaterialTheme.typography.titleLarge)
