@@ -62,6 +62,29 @@ class HomeViewModelTest {
         collectJob.cancel()
     }
 
+    @Test
+    fun createSamplePlan_savesActivePlan() = runTest {
+        val planRepository = FakeWorkoutPlanRepository()
+        val viewModel = HomeViewModel(
+            planRepository = planRepository,
+            recordRepository = FakeWorkoutRecordRepository(),
+            settingsRepository = FakeSettingsRepository()
+        )
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.createSamplePlan()
+        advanceUntilIdle()
+
+        assertEquals(1, planRepository.currentPlans.size)
+        assertEquals("三天新手快速开始", planRepository.currentPlans.first().name)
+        assertEquals(true, planRepository.currentPlans.first().isActive)
+        assertEquals("示例计划已创建，并设为当前计划", viewModel.uiState.value.message)
+
+        collectJob.cancel()
+    }
+
     private fun sampleRecord(id: Long, date: Long, duration: Int): WorkoutRecord {
         return WorkoutRecord(
             id = id,

@@ -1,7 +1,6 @@
 package com.fitplan.app.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,13 +19,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fitplan.app.domain.model.Exercise
 import com.fitplan.app.domain.model.WorkoutDay
 import com.fitplan.app.domain.model.WorkoutPlan
-import com.fitplan.app.ui.common.EmptyState
 import com.fitplan.app.ui.common.ScreenHeader
 import com.fitplan.app.ui.common.SectionCard
 import com.fitplan.app.ui.common.StatCard
@@ -47,6 +47,7 @@ fun HomeScreen(
         state = state,
         onStartWorkout = onStartWorkout,
         onSelectWorkoutDay = viewModel::selectWorkoutDay,
+        onCreateSamplePlan = viewModel::createSamplePlan,
         onNewPlan = onNewPlan,
         onAiPlan = onAiPlan,
         onHistory = onHistory,
@@ -59,6 +60,7 @@ fun HomeContent(
     state: HomeUiState,
     onStartWorkout: (Long, Long) -> Unit,
     onSelectWorkoutDay: (Long) -> Unit,
+    onCreateSamplePlan: () -> Unit,
     onNewPlan: () -> Unit,
     onAiPlan: () -> Unit,
     onHistory: () -> Unit,
@@ -66,12 +68,12 @@ fun HomeContent(
 ) {
     val plan = state.activePlan
     if (plan == null) {
-        EmptyState(
-            title = "今天还没有训练计划",
-            actionText = "新建计划",
-            onAction = onNewPlan,
-            modifier = modifier,
-            description = "手动创建计划，或使用 AI 生成一份可编辑的训练安排。"
+        EmptyHomeContent(
+            state = state,
+            onCreateSamplePlan = onCreateSamplePlan,
+            onNewPlan = onNewPlan,
+            onAiPlan = onAiPlan,
+            modifier = modifier
         )
         return
     }
@@ -94,6 +96,12 @@ fun HomeContent(
                 }
             )
         }
+        state.message?.let { message ->
+            item { Text(message, color = MaterialTheme.colorScheme.primary) }
+        }
+        state.errorMessage?.let { error ->
+            item { Text(error, color = MaterialTheme.colorScheme.error) }
+        }
         item {
             SectionCard {
                 AssistChip(onClick = {}, label = { Text("当前计划") })
@@ -113,7 +121,9 @@ fun HomeContent(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = { onStartWorkout(plan.id, todayDay.id) },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .weight(1f)
+                                .semantics { contentDescription = "开始今天的训练" }
                         ) {
                             Text("开始训练")
                         }
@@ -133,7 +143,8 @@ fun HomeContent(
                             FilterChip(
                                 selected = day.id == todayDay.id,
                                 onClick = { onSelectWorkoutDay(day.id) },
-                                label = { Text(day.dayName) }
+                                label = { Text(day.dayName) },
+                                modifier = Modifier.semantics { contentDescription = "选择训练日 ${day.dayName}" }
                             )
                         }
                     }
@@ -193,6 +204,67 @@ fun HomeContent(
     }
 }
 
+@Composable
+private fun EmptyHomeContent(
+    state: HomeUiState,
+    onCreateSamplePlan: () -> Unit,
+    onNewPlan: () -> Unit,
+    onAiPlan: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        item {
+            ScreenHeader(title = "欢迎使用 FitPlan", subtitle = "先创建一个计划，首页就能显示今天练什么")
+        }
+        state.message?.let { message ->
+            item { Text(message, color = MaterialTheme.colorScheme.primary) }
+        }
+        state.errorMessage?.let { error ->
+            item { Text(error, color = MaterialTheme.colorScheme.error) }
+        }
+        item {
+            SectionCard {
+                Text("快速开始", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(
+                    "创建一份本地示例计划，马上体验从计划到训练记录的完整流程。示例计划可以随时编辑或删除。",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Button(
+                    onClick = onCreateSamplePlan,
+                    enabled = !state.isCreatingSamplePlan,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics { contentDescription = "创建本地示例训练计划" }
+                ) {
+                    Text(if (state.isCreatingSamplePlan) "创建中..." else "创建示例计划")
+                }
+            }
+        }
+        item {
+            SectionCard {
+                Text("也可以从零开始", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButton(onClick = onNewPlan, modifier = Modifier.weight(1f)) {
+                        Text("手动创建")
+                    }
+                    OutlinedButton(onClick = onAiPlan, modifier = Modifier.weight(1f)) {
+                        Text("AI 生成")
+                    }
+                }
+                Text(
+                    "AI 生成需要先在设置页配置 API Key；手动计划和历史记录可离线使用。",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun HomeContentPreview() {
@@ -231,6 +303,7 @@ private fun HomeContentPreview() {
             ),
             onStartWorkout = { _, _ -> },
             onSelectWorkoutDay = {},
+            onCreateSamplePlan = {},
             onNewPlan = {},
             onAiPlan = {},
             onHistory = {}
