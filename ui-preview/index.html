@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FitPlan 阶段 5 UI Preview</title>
+  <title>FitPlan 阶段 6 UI Preview</title>
   <style>
     :root {
       --bg: #f7faf8;
@@ -156,15 +156,15 @@
         <div class="logo">F</div>
         <div>
           <h1>FitPlan UI Preview</h1>
-          <p>阶段 5 可点击原型：发布候选版、训练恢复、本地备份、AI 连接测试和核心离线流程。</p>
+          <p>阶段 6 可点击原型：内测发布准备、训练草稿处理、历史筛选、数据安全提示和核心离线流程。</p>
         </div>
       </div>
       <ul class="feature-list">
-        <li>首页可选择今日训练日，并突出本周训练次数和最近一次训练。</li>
+        <li>首页可选择今日训练日，并突出本周、近 7 天、总分钟数和最近一次训练。</li>
         <li>计划支持查看、编辑、复制、删除、设为当前，以及训练日/动作排序。</li>
-        <li>训练执行支持草稿恢复、动作勾选、备注和休息倒计时。</li>
-        <li>历史记录保存动作快照，计划后续编辑不会影响记录详情。</li>
-        <li>设置页支持 DeepSeek 连接测试和本地备份导入导出。</li>
+        <li>训练执行支持继续/放弃草稿、完成进度、备注、休息倒计时和结束提示。</li>
+        <li>历史记录保存动作快照，并支持全部/本周/本月筛选。</li>
+        <li>设置页支持 DeepSeek 连接测试、本地备份导入导出和 release 检查说明。</li>
       </ul>
     </aside>
 
@@ -175,12 +175,12 @@
         <div class="topline">
           <div>
             <h2>今天练什么</h2>
-            <p class="caption">本周已练 2 次 · 最近一次 06月22日 19:40</p>
+            <p class="caption">本周已练 2 次 · 近 7 天 3 次 / 165 分钟 · 最近一次 06月22日 19:40</p>
           </div>
         </div>
         <article class="card hero-card">
           <h3>四天增肌训练计划</h3>
-          <p>目标：增肌 · 今日训练日：Day 1 胸肩三头</p>
+          <p>目标：增肌 · 今日训练日：Day 1 胸肩三头 · 来自首页选择</p>
           <div class="chip-row" style="margin-top:12px">
             <button class="chip active" data-toast="已选择 Day 1 胸肩三头">Day 1</button>
             <button class="chip" data-toast="已选择 Day 2 背二头">Day 2</button>
@@ -271,7 +271,12 @@
       <section class="screen" id="workout">
         <h2>开始训练</h2>
         <p class="caption" style="margin-bottom: 8px;">今日训练日：Day 1 胸肩三头 · 来自当前计划选择</p>
-        <p class="tag" style="margin-bottom: 12px;">已恢复上次未完成训练</p>
+        <p class="tag" style="margin-bottom: 12px;">1/5 已完成</p>
+        <article class="card hero-card">
+          <h3>发现上次未完成训练</h3>
+          <p>可以继续上次进度，也可以放弃草稿重新开始。</p>
+          <div class="button-row" style="margin-top:10px"><button data-toast="继续上次未完成训练">继续训练</button><button class="secondary" data-toast="已放弃上次训练草稿">放弃草稿</button></div>
+        </article>
         <article class="card exercise">
           <div class="check done">✓</div>
           <div><h3>杠铃卧推</h3><p>胸 · 4 组 · 8-10 次 · 自选重量 · 休息 90s</p><label style="margin-top:10px">实际备注<input value="最后一组接近力竭"></label></div>
@@ -281,7 +286,7 @@
           <div>
             <h3>坐姿推举</h3>
             <p>肩 · 4 组 · 8-10 次 · 休息 90s</p>
-            <div class="button-row" style="margin:10px 0"><button class="secondary" data-toast="休息倒计时：90s">开始休息</button><button class="secondary" data-toast="休息已停止">停止休息 45s</button></div>
+            <div class="button-row" style="margin:10px 0"><button class="secondary" data-toast="休息倒计时：90s">开始休息</button><button class="secondary" data-toast="休息结束，可以开始下一组了">停止休息 45s</button></div>
             <label>实际备注<input placeholder="可填写实际感受"></label>
           </div>
         </article>
@@ -291,6 +296,7 @@
 
       <section class="screen" id="history">
         <h2 style="margin-bottom:14px">训练记录</h2>
+        <div class="chip-row" style="margin-bottom:12px"><button class="chip active">全部</button><button class="chip">本周</button><button class="chip">本月</button></div>
         <article class="card">
           <h3>四天增肌训练计划</h3>
           <p>Day 1 胸肩三头 · 58 分钟</p>
@@ -333,7 +339,7 @@
 
       <section class="screen" id="settings">
         <h2>设置</h2>
-        <p class="caption" style="margin-bottom:14px">API Key 只保存在本机。手动计划和历史记录离线可用。</p>
+        <p class="caption" style="margin-bottom:14px">API Key 只保存在本机，卸载 App 会丢失。手动计划和历史记录离线可用。</p>
         <article class="card">
           <h3>DeepSeek</h3>
           <p class="tag">已配置 API Key，可在 AI 页面生成计划。</p>
@@ -343,9 +349,10 @@
         </article>
         <article class="card">
           <h3>本地备份</h3>
-          <p>导出生成 JSON 文本；导入会先预览，并作为新计划/新记录写入。</p>
+          <p>导出生成 JSON 文本并展示版本/导出时间；导入会先预览，并作为新计划/新记录写入，只新增、不覆盖。</p>
           <div class="button-row" style="margin:12px 0"><button data-toast="备份 JSON 已生成">生成备份 JSON</button><button class="secondary" data-toast="已读取备份：2 个计划，3 条记录">预览导入</button><button class="secondary" data-toast="导入完成：2 个计划，3 条记录">确认导入</button></div>
-          <label>导出的备份 JSON<textarea readonly>{"version":1,"plans":[...],"records":[...]}</textarea></label>
+          <p class="tag">备份版本 1 · 导出时间 2026-06-25 09:30</p>
+          <label>导出的备份 JSON<textarea readonly>{"version":1,"exportedAt":1782360600000,"plans":[...],"records":[...]}</textarea></label>
           <label>粘贴备份 JSON<textarea placeholder="把其他设备导出的 JSON 粘贴到这里"></textarea></label>
         </article>
       </section>
