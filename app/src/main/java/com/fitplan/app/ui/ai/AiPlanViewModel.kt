@@ -80,13 +80,7 @@ class AiPlanViewModel(
 
         viewModelScope.launch {
             updateState {
-                copy(
-                    isLoading = true,
-                    errorMessage = null,
-                    message = null,
-                    preview = null,
-                    savedPlanId = null
-                )
+                copy(isLoading = true, errorMessage = null, message = null, preview = null, savedPlanId = null)
             }
             aiPlanRepository.generatePlan(input.getOrThrow())
                 .onSuccess { plan ->
@@ -120,9 +114,7 @@ class AiPlanViewModel(
 
     fun updatePreviewDay(dayIndex: Int, dayName: String) {
         updatePreviewPlan {
-            copy(days = days.mapIndexed { index, day ->
-                if (index == dayIndex) day.copy(dayName = dayName) else day
-            })
+            copy(days = days.mapIndexed { index, day -> if (index == dayIndex) day.copy(dayName = dayName) else day })
         }
     }
 
@@ -162,31 +154,18 @@ class AiPlanViewModel(
             updateState { copy(isSaving = true, errorMessage = null, message = null) }
             workoutPlanRepository.savePlan(plan.getOrThrow())
                 .onSuccess { planId ->
-                    updateState {
-                        copy(
-                            isSaving = false,
-                            savedPlanId = planId,
-                            message = "AI 计划已保存"
-                        )
-                    }
+                    updateState { copy(isSaving = false, savedPlanId = planId, message = "AI 计划已保存") }
                 }
                 .onFailure { throwable ->
-                    updateState {
-                        copy(
-                            isSaving = false,
-                            errorMessage = throwable.message ?: "保存计划失败"
-                        )
-                    }
+                    updateState { copy(isSaving = false, errorMessage = throwable.message ?: "保存计划失败") }
                 }
         }
     }
 
     private fun AiPlanUiState.toInputOrError(): Result<AiPlanInput> {
         return runCatching {
-            val days = daysPerWeek.toIntOrNull()
-                ?: throw IllegalArgumentException("请输入每周训练天数")
-            val duration = durationMinutes.toIntOrNull()
-                ?: throw IllegalArgumentException("请输入每次训练时长")
+            val days = daysPerWeek.toIntOrNull() ?: throw IllegalArgumentException("请输入每周训练天数")
+            val duration = durationMinutes.toIntOrNull() ?: throw IllegalArgumentException("请输入每次训练时长")
             require(goal.isNotBlank()) { "请选择健身目标" }
             require(days in 1..7) { "每周训练天数必须在 1 到 7 之间" }
             require(duration > 0) { "每次训练时长必须大于 0" }
@@ -205,10 +184,8 @@ class AiPlanViewModel(
 
     private fun AiGeneratedPlanForm.toWorkoutPlanOrError(): Result<WorkoutPlan> {
         return runCatching {
-            val frequency = frequencyPerWeek.toIntOrNull()
-                ?: throw IllegalArgumentException("请输入每周训练次数")
-            val duration = estimatedDurationMinutes.toIntOrNull()
-                ?: throw IllegalArgumentException("请输入每次训练时长")
+            val frequency = frequencyPerWeek.toIntOrNull() ?: throw IllegalArgumentException("请输入每周训练次数")
+            val duration = estimatedDurationMinutes.toIntOrNull() ?: throw IllegalArgumentException("请输入每次训练时长")
             require(name.isNotBlank()) { "计划名称不能为空" }
             require(goal.isNotBlank()) { "训练目标不能为空" }
             require(frequency in 1..7) { "每周训练次数必须在 1 到 7 之间" }
@@ -230,10 +207,8 @@ class AiPlanViewModel(
                         sortOrder = dayIndex,
                         exercises = day.exercises.mapIndexed { exerciseIndex, exercise ->
                             val label = "${day.dayName} 第 ${exerciseIndex + 1} 个动作"
-                            val sets = exercise.sets.toIntOrNull()
-                                ?: throw IllegalArgumentException("$label 组数必须是数字")
-                            val restSeconds = exercise.restSeconds.toIntOrNull()
-                                ?: throw IllegalArgumentException("$label 休息时间必须是数字")
+                            val sets = exercise.sets.toIntOrNull() ?: throw IllegalArgumentException("$label 组数必须是数字")
+                            val restSeconds = exercise.restSeconds.toIntOrNull() ?: throw IllegalArgumentException("$label 休息时间必须是数字")
                             require(exercise.name.isNotBlank()) { "$label 名称不能为空" }
                             require(exercise.bodyPart.isNotBlank()) { "$label 部位不能为空" }
                             require(sets > 0) { "$label 组数必须大于 0" }

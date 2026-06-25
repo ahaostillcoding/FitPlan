@@ -35,7 +35,7 @@ data class SettingsUiState(
     val apiKeyStatus: String = if (hasApiKey) {
         "已配置 API Key，可在 AI 页面生成计划。"
     } else {
-        "未配置 API Key，AI 生成暂不可用；离线计划和记录不受影响。"
+        "未配置 API Key，AI 生成功能暂不可用；离线计划和记录不受影响。"
     }
 }
 
@@ -87,10 +87,7 @@ class SettingsViewModel(
                 _uiState.update { it.copy(isSaving = false, message = "设置已保存") }
             }.onFailure { throwable ->
                 _uiState.update {
-                    it.copy(
-                        isSaving = false,
-                        errorMessage = throwable.message ?: "保存设置失败"
-                    )
+                    it.copy(isSaving = false, errorMessage = throwable.message ?: "保存设置失败")
                 }
             }
         }
@@ -102,20 +99,9 @@ class SettingsViewModel(
             runCatching {
                 settingsRepository.clearDeepSeekApiKey()
             }.onSuccess {
-                _uiState.update {
-                    it.copy(
-                        apiKey = "",
-                        isSaving = false,
-                        message = "API Key 已清空"
-                    )
-                }
+                _uiState.update { it.copy(apiKey = "", isSaving = false, message = "API Key 已清空") }
             }.onFailure { throwable ->
-                _uiState.update {
-                    it.copy(
-                        isSaving = false,
-                        errorMessage = throwable.message ?: "清空 API Key 失败"
-                    )
-                }
+                _uiState.update { it.copy(isSaving = false, errorMessage = throwable.message ?: "清空 API Key 失败") }
             }
         }
     }
@@ -130,12 +116,7 @@ class SettingsViewModel(
             _uiState.update { it.copy(isTestingConnection = true, message = null, errorMessage = null) }
             repository.testConnection()
                 .onSuccess {
-                    _uiState.update {
-                        it.copy(
-                            isTestingConnection = false,
-                            message = "DeepSeek 连接测试成功"
-                        )
-                    }
+                    _uiState.update { it.copy(isTestingConnection = false, message = "DeepSeek 连接测试成功") }
                 }
                 .onFailure { throwable ->
                     _uiState.update {
@@ -167,24 +148,14 @@ class SettingsViewModel(
                     }
                 }
                 .onFailure { throwable ->
-                    _uiState.update {
-                        it.copy(
-                            isBackupBusy = false,
-                            errorMessage = throwable.message ?: "导出备份失败"
-                        )
-                    }
+                    _uiState.update { it.copy(isBackupBusy = false, errorMessage = throwable.message ?: "导出备份失败") }
                 }
         }
     }
 
     fun updateImportJson(value: String) {
         _uiState.update {
-            it.copy(
-                importJson = value,
-                importPreview = null,
-                message = null,
-                errorMessage = null
-            )
+            it.copy(importJson = value, importPreview = null, message = null, errorMessage = null)
         }
     }
 
@@ -212,12 +183,7 @@ class SettingsViewModel(
                 }
             }
             .onFailure { throwable ->
-                _uiState.update {
-                    it.copy(
-                        importPreview = null,
-                        errorMessage = throwable.message ?: "备份预览失败"
-                    )
-                }
+                _uiState.update { it.copy(importPreview = null, errorMessage = throwable.message ?: "备份预览失败") }
             }
     }
 
@@ -235,12 +201,7 @@ class SettingsViewModel(
                     }
                 }
                 .onFailure { throwable ->
-                    _uiState.update {
-                        it.copy(
-                            isBackupBusy = false,
-                            errorMessage = throwable.message ?: "导入备份失败"
-                        )
-                    }
+                    _uiState.update { it.copy(isBackupBusy = false, errorMessage = throwable.message ?: "导入备份失败") }
                 }
         }
     }
@@ -254,11 +215,7 @@ class SettingsViewModel(
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return SettingsViewModel(
-                        settingsRepository,
-                        backupRepository,
-                        aiPlanRepository
-                    ) as T
+                    return SettingsViewModel(settingsRepository, backupRepository, aiPlanRepository) as T
                 }
             }
     }
