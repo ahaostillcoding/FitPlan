@@ -16,6 +16,15 @@ Use this checklist before sharing a debug or release candidate APK with internal
 - Install the debug APK on at least one real Android device.
 - Launch the app after a fresh install and after an app process restart.
 
+## Latest Local Verification
+
+Verified on 2026-06-26 with portable JDK 17 and Android SDK under `D:\fp-toolchain`:
+
+- `:app:testDebugUnitTest` passed.
+- `:app:assembleDebug` passed and generated `app/build/outputs/apk/debug/app-debug.apk`.
+- `:app:assembleRelease` passed and generated `app/build/outputs/apk/release/app-release-unsigned.apk`.
+- `:app:lintDebug` passed and generated `app/build/reports/lint-results-debug.html`.
+
 ## Manual Regression
 
 - Fresh install the app, create the sample plan from the empty state, and confirm it becomes the active plan.
