@@ -15,7 +15,7 @@ Use this log for Stage 9 internal testing. Keep one row per issue so fixes can b
 | BETA-001 | P1 | Release | Fixed | Stage 9 needs a single place to track feedback and RC readiness. | Review repository docs after Stage 8. | Stage 9 docs commit | Confirm this file and `docs/1.0-rc-notes.md` exist. |
 | BETA-002 | P1 | Backup | Fixed | Import result should say how many plans/records were added and skipped. | Import a backup JSON from Settings. | Backup summary commit | `SettingsViewModelTest.importBackup_setsResultSummaryWithSkippedCounts` passed. |
 | BETA-003 | P1 | Workout | Fixed | Old workout draft should be called out before restoring. | Start a workout, leave draft for a long time, reopen same day. | Draft expiry commit | `WorkoutSessionViewModelTest.expiredDraftClearsSavedDraftAndStartsFresh` passed. |
-| BETA-004 | P2 | UI | Planned | Stage 9 HTML prototype should mention RC readiness and beta fixes. | Open `ui-preview/index.html`. | Pending | Verify title and sidebar content. |
+| BETA-004 | P2 | UI | Fixed | Stage 9 HTML prototype should mention RC readiness and beta fixes. | Open `ui-preview/index.html`. | Stage 9 prototype commit | Verified title, sidebar, backup summary, and draft expiry copy. |
 
 ## Verification Notes
 

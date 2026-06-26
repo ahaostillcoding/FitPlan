@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FitPlan 阶段 8 UI 原型</title>
+  <title>FitPlan 阶段 9 RC 原型</title>
   <style>
     :root {
       --bg: #eef6f0;
@@ -13,6 +13,7 @@
       --muted: #66756b;
       --border: #d9e7dd;
       --primary: #267a3c;
+      --primary-dark: #0e5a2c;
       --danger: #b42318;
       --warning: #9a6500;
       --radius: 18px;
@@ -30,8 +31,24 @@
     }
     h1, h2, h3, p { margin: 0; }
     p { color: var(--muted); line-height: 1.55; }
-    button, input, textarea, select { font: inherit; }
-    button { border: 0; cursor: pointer; border-radius: 14px; min-height: 46px; padding: 0 14px; font-weight: 800; }
+    button, input, textarea { font: inherit; }
+    button {
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      min-height: 48px;
+      padding: 0 14px;
+      font-weight: 800;
+    }
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+    textarea { min-height: 76px; resize: vertical; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 800; }
     .stage { width: min(1120px, 100%); display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: start; }
     .brief, .card, .toast, .dialog { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
     .brief { padding: 24px; position: sticky; top: 24px; box-shadow: 0 20px 60px rgba(12,46,22,.12); }
@@ -50,7 +67,7 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
     .card { padding: 16px; box-shadow: 0 8px 24px rgba(12,46,22,.06); }
-    .hero { background: linear-gradient(135deg, #267a3c, #0e5a2c); color: #fff; border: 0; }
+    .hero { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; border: 0; }
     .hero p { color: rgba(255,255,255,.82); }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-secondary { background: var(--soft); color: var(--primary); }
@@ -61,9 +78,6 @@
     .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
     .stat { background: var(--soft); padding: 12px; border-radius: 14px; }
     .stat strong { display: block; font-size: 22px; color: var(--primary); }
-    input, textarea, select { width: 100%; border: 1px solid var(--border); border-radius: 14px; padding: 12px; background: #fff; }
-    textarea { min-height: 76px; resize: vertical; }
-    label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 800; }
     .notice { padding: 12px; border-radius: 14px; background: #fff6de; color: var(--warning); border: 1px solid #f2d48a; font-size: 13px; }
     .bottom-nav { position: absolute; left: 0; right: 0; bottom: 0; height: 76px; display: grid; grid-template-columns: repeat(5, 1fr); background: #fff; border-top: 1px solid var(--border); padding: 8px; }
     .nav { background: transparent; color: var(--muted); display: grid; place-items: center; gap: 2px; font-size: 11px; }
@@ -78,40 +92,36 @@
 <body>
   <main class="stage">
     <aside class="brief">
-      <div class="brand"><div class="logo">F</div><div><h1>FitPlan</h1><p>阶段 8 内测体验原型</p></div></div>
-      <p>本版聚焦首次使用、误操作防护、AI 预览保存、备份风险提示和内测验收路径。</p>
+      <div class="brand"><div class="logo">F</div><div><h1>FitPlan</h1><p>阶段 9 · 1.0 RC 原型</p></div></div>
+      <p>本版聚焦内测反馈闭环、真实设备体验收口、备份导入摘要、草稿过期提示和 1.0 发布候选准备。</p>
       <ul class="audit-list">
-        <li><b>首次使用：</b>空状态可一键创建示例计划，快速进入训练闭环。</li>
-        <li><b>防误操作：</b>未完成动作、删除、放弃草稿、导入备份都有确认。</li>
-        <li><b>可访问性：</b>主操作不小于 48dp，按钮语义更清晰。</li>
-        <li><b>质量闭环：</b>HTML、README、内测清单和构建验证同步。</li>
+        <li><b>反馈闭环：</b>新增 beta feedback log，P0/P1 问题必须验证后关闭。</li>
+        <li><b>备份导入：</b>导入完成后展示新增计划、记录和跳过项。</li>
+        <li><b>训练草稿：</b>超过 24 小时的草稿不自动恢复，提醒重新开始。</li>
+        <li><b>发布候选：</b>保留离线优先，准备 debug/release APK 验证记录。</li>
       </ul>
     </aside>
 
-    <section class="phone" aria-label="FitPlan 阶段 8 移动端原型">
-      <div class="statusbar"><span>9:41</span><span>FitPlan</span></div>
+    <section class="phone" aria-label="FitPlan 阶段 9 移动端原型">
+      <div class="statusbar"><span>9:41</span><span>FitPlan RC</span></div>
 
       <section class="screen active" id="home">
-        <div class="head"><div><p>晚上好，今天练什么</p><h2>Day 1 胸肩三头</h2></div><button class="btn-ghost" data-screen="settings">设置</button></div>
+        <div class="head"><div><p>今天练什么</p><h2>Day 1 胸肩三头</h2></div><button class="btn-ghost" data-screen="settings">设置</button></div>
         <div class="card hero stack">
           <span class="chip" style="width:max-content">当前计划</span>
           <h2>四天增肌训练计划</h2>
-          <p>今天预计 60 分钟 · 5 个动作 · 来源：当前计划第一个训练日</p>
+          <p>预计 60 分钟 · 5 个动作 · 来源：当前计划的训练日选择</p>
           <div class="grid-2"><button class="btn-secondary" data-screen="workout">开始训练</button><button class="btn-ghost" style="color:#fff" data-screen="detail">查看计划</button></div>
-        </div>
-        <div class="card stack" style="margin-top:12px">
-          <h3>首次使用快速开始</h3>
-          <p>如果还没有计划，可以创建一份本地示例计划。示例只写入本机数据库，可随时编辑或删除。</p>
-          <div class="grid-2"><button class="btn-primary" data-toast="已创建示例计划，并设为当前计划">创建示例计划</button><button class="btn-secondary" data-screen="edit">手动创建</button></div>
         </div>
         <div class="grid-3" style="margin-top:12px">
           <div class="stat"><p>本周</p><strong>3</strong><p>次</p></div>
           <div class="stat"><p>近 7 天</p><strong>180</strong><p>分钟</p></div>
-          <div class="stat"><p>连续</p><strong>6</strong><p>天记录</p></div>
+          <div class="stat"><p>RC</p><strong>9</strong><p>阶段</p></div>
         </div>
         <div class="card stack" style="margin-top:12px">
-          <div class="row"><h3>快捷入口</h3><button class="btn-ghost" data-screen="history">查看记录</button></div>
-          <div class="grid-2"><button class="btn-secondary" data-screen="edit">新建计划</button><button class="btn-secondary" data-screen="ai">AI 生成</button></div>
+          <h3>内测提醒</h3>
+          <p>如果你是首次安装，可以创建示例计划快速走通训练闭环。所有数据默认保存在本机。</p>
+          <div class="grid-2"><button class="btn-primary" data-toast="已创建示例计划，并设为当前计划">创建示例计划</button><button class="btn-secondary" data-screen="edit">手动创建</button></div>
         </div>
       </section>
 
@@ -128,123 +138,102 @@
       </section>
 
       <section class="screen" id="detail">
-        <div class="head"><button class="btn-ghost" data-screen="plans">返回</button><h3>计划详情</h3><button class="btn-danger" data-confirm="删除计划||删除后不会影响已保存的历史训练记录。">删除</button></div>
-        <div class="card stack">
-          <span class="chip active" style="width:max-content">当前计划</span>
-          <h2>四天增肌训练计划</h2>
-          <p>适合有一定训练基础的用户，重点提升胸背腿基础力量。</p>
-          <div class="grid-3"><div class="stat"><p>频率</p><strong>4</strong></div><div class="stat"><p>时长</p><strong>60</strong></div><div class="stat"><p>训练日</p><strong>4</strong></div></div>
-          <button class="btn-primary" data-screen="workout">开始 Day 1</button>
-        </div>
+        <div class="head"><button class="btn-ghost" data-screen="plans">返回</button><button class="btn-secondary" data-screen="edit">编辑</button></div>
+        <div class="card hero stack"><h2>四天增肌训练计划</h2><p>增肌 · 每周 4 次 · 每次 60 分钟</p><button class="btn-secondary" data-screen="workout">开始 Day 1</button></div>
+        <div class="card stack" style="margin-top:12px"><h3>Day 1 胸肩三头</h3><p>杠铃卧推 · 坐姿推举 · 绳索下压 · 侧平举 · 俯卧撑</p></div>
+        <div class="card stack" style="margin-top:12px"><h3>危险操作</h3><button class="btn-danger" data-dialog="删除计划前会再次确认，避免误删。">删除计划</button></div>
       </section>
 
       <section class="screen" id="edit">
-        <div class="head"><button class="btn-ghost" data-screen="plans">返回</button><div><p>计划编辑器</p><h3>新建训练计划</h3></div><button class="btn-ghost" data-toast="预览：4 天/周，当前训练日 2 个动作">预览</button></div>
+        <div class="head"><button class="btn-ghost" data-screen="plans">返回</button><h2>新建训练计划</h2></div>
         <div class="stack">
           <div class="card stack">
-            <h3>计划基础</h3>
+            <h3>基础信息</h3>
             <label>计划名称<input value="四天增肌训练计划" /></label>
             <div class="chip-row"><span class="chip active">增肌</span><span class="chip">减脂</span><span class="chip">塑形</span><span class="chip">力量</span></div>
             <div class="grid-2"><label>每周次数<input value="4" /></label><label>每次分钟<input value="60" /></label></div>
           </div>
           <div class="card stack">
-            <h3>训练日与动作</h3>
-            <div class="chip-row"><span class="chip active">Day 1 胸肩三头</span><span class="chip">Day 2 背二头</span><span class="chip">+ 添加</span></div>
+            <div class="row"><h3>训练日</h3><button class="btn-secondary" data-toast="已添加 Day 3">+ 添加</button></div>
+            <div class="chip-row"><span class="chip active">Day 1 胸肩三头</span><span class="chip">Day 2 背二头</span></div>
             <label>动作名称<input value="杠铃卧推" /></label>
-            <div class="grid-3"><label>部位<input value="胸" /></label><label>组数<input value="4" /></label><label>次数<input value="8-10" /></label></div>
-            <button class="btn-secondary" data-toast="错误会定位到具体训练日和动作">保存计划</button>
+            <div class="grid-2"><label>组数<input value="4" /></label><label>次数<input value="8-10" /></label></div>
+            <button class="btn-secondary" data-toast="已添加动作">添加动作</button>
           </div>
+          <button class="btn-primary" data-toast="计划已保存">保存计划</button>
         </div>
       </section>
 
       <section class="screen" id="workout">
-        <div class="head"><button class="btn-ghost" data-screen="home">返回</button><div><p>当前计划 · Day 1</p><h3>胸肩三头训练</h3></div></div>
+        <div class="head"><button class="btn-ghost" data-screen="home">返回</button><div><p>训练执行</p><h2>Day 1 胸肩三头</h2></div></div>
         <div class="card stack">
-          <h3>3/5 已完成</h3>
-          <p>完成训练前如果还有未完成动作，会先询问是否仍然保存记录。</p>
-          <button class="btn-secondary" data-toast="休息结束，可以开始下一组了">开始休息</button>
+          <h3>进度 3/5 已完成</h3>
+          <p>完成动作会实时更新进度，保存记录时会保留动作快照。</p>
+          <div class="notice">发现超过 24 小时的训练草稿时，将提示并为你重新开始。</div>
         </div>
-        <div class="card stack"><h3>杠铃卧推</h3><p>4 组 · 8-10 次 · 休息 90 秒</p><button class="btn-secondary">已完成</button></div>
-        <div class="card stack"><h3>坐姿肩推</h3><p>4 组 · 8-10 次 · 休息 90 秒</p><button class="btn-secondary">完成</button></div>
-        <button class="btn-primary" style="width:100%;margin-top:12px" data-confirm="仍然保存训练？||还有 2 个动作未完成。可以继续训练，也可以按当前完成状态保存记录。">完成训练</button>
+        <div class="card stack" style="margin-top:12px"><h3>杠铃卧推</h3><p>胸 · 4 组 · 8-10 次 · 休息 90s</p><button class="btn-secondary" data-toast="休息计时开始">开始休息</button><textarea placeholder="实际备注"></textarea></div>
+        <button class="btn-primary" style="width:100%;margin-top:12px" data-dialog="还有 2 个动作未勾选完成。你可以继续训练，也可以仍然保存本次记录。">完成训练</button>
       </section>
 
       <section class="screen" id="history">
         <div class="head"><div><p>训练回顾</p><h2>历史记录</h2></div></div>
         <div class="chip-row"><span class="chip active">全部</span><span class="chip">本周</span><span class="chip">本月</span></div>
-        <article class="card stack" style="margin-top:12px"><h3>Day 1 胸肩三头</h3><p>2026-06-25 · 62 分钟 · 动作快照已保存</p><div class="grid-2"><button class="btn-secondary" data-screen="record">详情</button><button class="btn-danger" data-confirm="删除记录||删除后无法恢复，但不会影响训练计划。">删除</button></div></article>
-      </section>
-
-      <section class="screen" id="record">
-        <div class="head"><button class="btn-ghost" data-screen="history">返回</button><h3>记录详情</h3></div>
-        <div class="card stack"><h2>Day 1 胸肩三头</h2><p>2026-06-25 · 62 分钟</p><p>记录使用动作快照，不受计划后续编辑影响。</p></div>
+        <article class="card stack" style="margin-top:12px"><h3>四天增肌训练计划</h3><p>2026-06-26 · 58 分钟 · Day 1 胸肩三头</p><button class="btn-secondary" data-toast="记录详情使用动作快照，不受计划编辑影响">查看详情</button></article>
       </section>
 
       <section class="screen" id="ai">
-        <div class="head"><div><p>可选能力</p><h2>AI 生成计划</h2></div><button class="btn-secondary" data-screen="settings">设置 Key</button></div>
-        <div class="notice">生成结果先进入预览，保存前会再次校验字段，不会覆盖已有计划。</div>
-        <div class="card stack" style="margin-top:12px">
-          <label>目标<select><option>增肌</option><option>减脂</option></select></label>
-          <div class="grid-2"><label>每周天数<input value="4" /></label><label>每次分钟<input value="60" /></label></div>
-          <button class="btn-primary" data-toast="生成完成，请预览后保存">生成并预览</button>
-          <button class="btn-secondary" data-screen="edit">继续编辑预览</button>
-        </div>
+        <div class="head"><div><p>可选能力</p><h2>AI 生成计划</h2></div></div>
+        <div class="card stack"><label>健身目标<input value="增肌" /></label><label>器械<input value="哑铃、杠铃、健身房器械" /></label><button class="btn-primary" data-toast="AI 计划已生成，请预览并确认后保存">生成并预览</button></div>
+        <div class="card stack" style="margin-top:12px"><h3>预览：四天增肌计划</h3><p>保存前会校验计划名、训练日、动作名称、组数和休息时间。</p><button class="btn-secondary" data-toast="已保存为新计划">保存计划</button></div>
       </section>
 
       <section class="screen" id="settings">
         <div class="head"><div><p>本机配置</p><h2>设置</h2></div></div>
-        <div class="card stack">
-          <h3>DeepSeek API Key</h3>
-          <p>Key 仅保存在本机，卸载 App 后会丢失。</p>
-          <input type="password" value="sk-••••••••" />
-          <div class="grid-2"><button class="btn-primary" data-toast="设置已保存">保存</button><button class="btn-danger" data-confirm="清空 API Key||清空后 AI 生成计划将不可用。">清空</button></div>
-        </div>
-        <div class="card stack" style="margin-top:12px"><h3>本地备份</h3><p>导入只新增，不覆盖已有数据。</p><button class="btn-secondary" data-confirm="确认导入备份？||导入会新增计划和记录，不会覆盖现有数据。">确认导入</button></div>
+        <div class="card stack"><h3>DeepSeek API Key</h3><p>Key 仅保存在本机，卸载 App 会丢失；未配置 Key 时离线功能不受影响。</p><input placeholder="sk-..." /><button class="btn-primary" data-toast="设置已保存">保存</button></div>
+        <div class="card stack" style="margin-top:12px"><h3>本地备份</h3><p>导入只新增，不覆盖已有数据。导入完成后会显示新增和跳过数量。</p><textarea>{"version":1,"plans":[],"records":[]}</textarea><button class="btn-secondary" data-toast="已读取备份：2 个计划，3 条记录；导入只新增，不覆盖已有数据">预览导入</button><button class="btn-primary" data-toast="导入完成：新增 2 个计划、3 条记录；跳过 0 个计划、0 条记录">确认导入</button></div>
       </section>
 
-      <nav class="bottom-nav">
-        <button class="nav active" data-nav="home"><span>⌂</span><span>首页</span></button>
-        <button class="nav" data-nav="plans"><span>▤</span><span>计划</span></button>
-        <button class="nav" data-nav="history"><span>◷</span><span>记录</span></button>
-        <button class="nav" data-nav="ai"><span>AI</span><span>AI</span></button>
-        <button class="nav" data-nav="settings"><span>⚙</span><span>设置</span></button>
+      <nav class="bottom-nav" aria-label="底部导航">
+        <button class="nav active" data-screen="home"><b>⌂</b><span>首页</span></button>
+        <button class="nav" data-screen="plans"><b>□</b><span>计划</span></button>
+        <button class="nav" data-screen="history"><b>≡</b><span>记录</span></button>
+        <button class="nav" data-screen="ai"><b>AI</b><span>AI</span></button>
+        <button class="nav" data-screen="settings"><b>⚙</b><span>设置</span></button>
       </nav>
       <div class="toast" id="toast"></div>
-      <div class="dialog" id="dialog"><h3 id="dialogTitle"></h3><p id="dialogText"></p><div class="grid-2"><button class="btn-ghost" id="dialogCancel">取消</button><button class="btn-primary" id="dialogConfirm">确认</button></div></div>
+      <div class="dialog" id="dialog"><h3>确认操作</h3><p id="dialogText"></p><div class="grid-2"><button class="btn-secondary" data-close-dialog>继续操作</button><button class="btn-primary" data-close-dialog>我知道了</button></div></div>
     </section>
   </main>
   <script>
-    const screens = document.querySelectorAll(".screen");
-    const navItems = document.querySelectorAll(".nav");
-    const toast = document.getElementById("toast");
-    const dialog = document.getElementById("dialog");
-    let timer;
+    const screens = [...document.querySelectorAll('.screen')];
+    const navs = [...document.querySelectorAll('.nav')];
+    const toast = document.getElementById('toast');
+    const dialog = document.getElementById('dialog');
+    const dialogText = document.getElementById('dialogText');
+    let toastTimer;
     function showScreen(id) {
-      screens.forEach(s => s.classList.toggle("active", s.id === id));
-      navItems.forEach(n => n.classList.toggle("active", n.dataset.nav === id));
+      screens.forEach(screen => screen.classList.toggle('active', screen.id === id));
+      navs.forEach(nav => nav.classList.toggle('active', nav.dataset.screen === id));
+      dialog.classList.remove('show');
     }
     function showToast(text) {
+      clearTimeout(toastTimer);
       toast.textContent = text;
-      toast.classList.add("show");
-      clearTimeout(timer);
-      timer = setTimeout(() => toast.classList.remove("show"), 1800);
+      toast.classList.add('show');
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
     }
-    function openConfirm(raw) {
-      const [title, text] = raw.split("||");
-      document.getElementById("dialogTitle").textContent = title;
-      document.getElementById("dialogText").textContent = text;
-      dialog.classList.add("show");
-    }
-    document.addEventListener("click", event => {
-      const button = event.target.closest("button");
-      if (!button) return;
-      if (button.dataset.nav) showScreen(button.dataset.nav);
-      if (button.dataset.screen) showScreen(button.dataset.screen);
-      if (button.dataset.toast) showToast(button.dataset.toast);
-      if (button.dataset.confirm) openConfirm(button.dataset.confirm);
+    document.addEventListener('click', event => {
+      const screenTarget = event.target.closest('[data-screen]');
+      if (screenTarget) showScreen(screenTarget.dataset.screen);
+      const toastTarget = event.target.closest('[data-toast]');
+      if (toastTarget) showToast(toastTarget.dataset.toast);
+      const dialogTarget = event.target.closest('[data-dialog]');
+      if (dialogTarget) {
+        dialogText.textContent = dialogTarget.dataset.dialog;
+        dialog.classList.add('show');
+      }
+      if (event.target.closest('[data-close-dialog]')) dialog.classList.remove('show');
     });
-    document.getElementById("dialogCancel").addEventListener("click", () => dialog.classList.remove("show"));
-    document.getElementById("dialogConfirm").addEventListener("click", () => { dialog.classList.remove("show"); showToast("操作已确认"); });
   </script>
 </body>
 </html>
