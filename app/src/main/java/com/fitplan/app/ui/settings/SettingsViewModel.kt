@@ -177,7 +177,7 @@ class SettingsViewModel(
                 _uiState.update {
                     it.copy(
                         importPreview = preview,
-                        message = "已读取备份：${preview.planCount} 个计划，${preview.recordCount} 条记录",
+                        message = "已读取备份：${preview.planCount} 个计划，${preview.recordCount} 条记录；导入只新增，不覆盖已有数据",
                         errorMessage = null
                     )
                 }
@@ -196,7 +196,7 @@ class SettingsViewModel(
                         it.copy(
                             isBackupBusy = false,
                             importPreview = preview,
-                            message = "导入完成：${preview.planCount} 个计划，${preview.recordCount} 条记录"
+                            message = preview.importResultSummary()
                         )
                     }
                 }
@@ -204,6 +204,10 @@ class SettingsViewModel(
                     _uiState.update { it.copy(isBackupBusy = false, errorMessage = throwable.message ?: "导入备份失败") }
                 }
         }
+    }
+
+    private fun BackupPreview.importResultSummary(): String {
+        return "导入完成：新增 ${planCount} 个计划、${recordCount} 条记录；跳过 ${skippedPlanCount} 个计划、${skippedRecordCount} 条记录"
     }
 
     companion object {

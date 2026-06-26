@@ -146,7 +146,10 @@ private fun SettingsContent(
                 minLines = 4
             )
             state.importPreview?.let { preview ->
-                Text("预览：${preview.planCount} 个计划，${preview.recordCount} 条记录", color = MaterialTheme.colorScheme.primary)
+                Text(
+                    "预览：${preview.planCount} 个计划，${preview.recordCount} 条记录；当前将跳过 ${preview.totalSkippedCount} 项",
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(onClick = onPreviewImport, enabled = !state.isBackupBusy, modifier = Modifier.weight(1f)) {

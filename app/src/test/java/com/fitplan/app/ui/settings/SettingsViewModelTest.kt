@@ -125,6 +125,31 @@ class SettingsViewModelTest {
         assertEquals(3, viewModel.uiState.value.importPreview?.recordCount)
     }
 
+    @Test
+    fun importBackup_setsResultSummaryWithSkippedCounts() = runTest {
+        val viewModel = SettingsViewModel(
+            FakeSettingsRepository(),
+            FakeBackupRepository(
+                preview = BackupPreview(
+                    planCount = 2,
+                    recordCount = 3,
+                    skippedPlanCount = 1,
+                    skippedRecordCount = 0
+                )
+            )
+        )
+
+        viewModel.updateImportJson("""{"version":1}""")
+        viewModel.previewImport()
+        viewModel.importBackup()
+        advanceUntilIdle()
+
+        assertEquals(
+            "导入完成：新增 2 个计划、3 条记录；跳过 1 个计划、0 条记录",
+            viewModel.uiState.value.message
+        )
+    }
+
     private class FakeSettingsRepository(
         apiKey: String = "",
         model: String = DEFAULT_DEEPSEEK_MODEL

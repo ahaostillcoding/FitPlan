@@ -18,8 +18,12 @@ data class FitPlanBackup(
 
 data class BackupPreview(
     val planCount: Int,
-    val recordCount: Int
-)
+    val recordCount: Int,
+    val skippedPlanCount: Int = 0,
+    val skippedRecordCount: Int = 0
+) {
+    val totalSkippedCount: Int = skippedPlanCount + skippedRecordCount
+}
 
 interface BackupRepository {
     suspend fun exportBackupJson(): Result<String>

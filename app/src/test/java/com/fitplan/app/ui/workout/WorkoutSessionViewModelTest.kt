@@ -114,11 +114,12 @@ class WorkoutSessionViewModelTest {
 
     @Test
     fun matchingDraftRestoresSession() = runTest {
+        val recentStartedAt = System.currentTimeMillis()
         val draftJson = """
             {
               "planId": 1,
               "dayId": 10,
-              "startedAt": 123456,
+              "startedAt": $recentStartedAt,
               "sessionNotes": "恢复训练",
               "progress": [
                 {
@@ -140,10 +141,47 @@ class WorkoutSessionViewModelTest {
 
         val state = viewModel.uiState.value
         assertTrue(state.restoredFromDraft)
-        assertEquals(123456L, state.startedAt)
+        assertEquals(recentStartedAt, state.startedAt)
         assertEquals("恢复训练", state.sessionNotes)
         assertTrue(state.exerciseProgress.getValue(100).isCompleted)
         assertEquals("上一轮完成", state.exerciseProgress.getValue(100).actualNotes)
+    }
+
+    @Test
+    fun expiredDraftClearsSavedDraftAndStartsFresh() = runTest {
+        val expiredStartedAt = System.currentTimeMillis() - 25L * 60L * 60L * 1000L
+        val settingsRepository = FakeSettingsRepository(
+            workoutDraftJson = """
+                {
+                  "planId": 1,
+                  "dayId": 10,
+                  "startedAt": $expiredStartedAt,
+                  "sessionNotes": "旧训练",
+                  "progress": [
+                    {
+                      "exerciseId": 100,
+                      "isCompleted": true,
+                      "actualNotes": "旧进度"
+                    }
+                  ]
+                }
+            """.trimIndent()
+        )
+        val viewModel = WorkoutSessionViewModel(
+            planId = 1,
+            dayId = 10,
+            planRepository = FakeWorkoutPlanRepository(listOf(samplePlan())),
+            recordRepository = FakeWorkoutRecordRepository(),
+            settingsRepository = settingsRepository
+        )
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.restoredFromDraft)
+        assertEquals("", state.sessionNotes)
+        assertFalse(state.exerciseProgress.getValue(100).isCompleted)
+        assertEquals("", settingsRepository.current.workoutDraftJson)
+        assertEquals("发现超过 24 小时的训练草稿，已为你重新开始", state.message)
     }
 
     @Test

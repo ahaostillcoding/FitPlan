@@ -234,8 +234,13 @@ class WorkoutSessionViewModel(
                         _uiState.update { it.copy(isLoading = false, errorMessage = "没有找到可训练的内容") }
                     } else {
                         val draft = readMatchingDraft(selectedDay.id)
+                        val isDraftExpired = draft?.isExpired() == true
+                        if (isDraftExpired) {
+                            settingsRepository.clearWorkoutDraft()
+                        }
+                        val restorableDraft = draft.takeUnless { isDraftExpired }
                         val defaultProgress = defaultProgress(selectedDay)
-                        val restoredProgress = draft?.progress
+                        val restoredProgress = restorableDraft?.progress
                             ?.filter { progress -> selectedDay.exercises.any { it.id == progress.exerciseId } }
                             ?.associateBy { it.exerciseId }
                             .orEmpty()
@@ -243,10 +248,11 @@ class WorkoutSessionViewModel(
                             isLoading = false,
                             plan = plan,
                             day = selectedDay,
-                            startedAt = draft?.startedAt ?: System.currentTimeMillis(),
-                            sessionNotes = draft?.sessionNotes.orEmpty(),
+                            startedAt = restorableDraft?.startedAt ?: System.currentTimeMillis(),
+                            sessionNotes = restorableDraft?.sessionNotes.orEmpty(),
                             exerciseProgress = defaultProgress + restoredProgress,
-                            restoredFromDraft = draft != null
+                            restoredFromDraft = restorableDraft != null,
+                            message = if (isDraftExpired) "发现超过 24 小时的训练草稿，已为你重新开始" else null
                         )
                     }
                 }
@@ -315,9 +321,15 @@ class WorkoutSessionViewModel(
         val startedAt: Long,
         val sessionNotes: String,
         val progress: List<WorkoutExerciseProgress>
-    )
+    ) {
+        fun isExpired(now: Long = System.currentTimeMillis()): Boolean {
+            return startedAt <= 0 || now - startedAt > DRAFT_EXPIRY_MILLIS
+        }
+    }
 
     companion object {
+        private const val DRAFT_EXPIRY_MILLIS = 24L * 60L * 60L * 1000L
+
         fun factory(
             planId: Long,
             dayId: Long,
