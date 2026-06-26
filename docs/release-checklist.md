@@ -18,12 +18,12 @@ Use this checklist before sharing a debug or release candidate APK with internal
 
 ## Latest Local Verification
 
-Verified on 2026-06-26 with portable JDK 17 and Android SDK under `D:\fp-toolchain`:
+Verified for Stage 9 on 2026-06-26 with portable JDK 17 and Android SDK under `D:\fp-toolchain`:
 
 - `:app:testDebugUnitTest` passed.
 - `:app:assembleDebug` passed and generated `app/build/outputs/apk/debug/app-debug.apk`.
 - `:app:assembleRelease` passed and generated `app/build/outputs/apk/release/app-release-unsigned.apk`.
-- `:app:lintDebug` passed and generated `app/build/reports/lint-results-debug.html`.
+- `:app:lintDebug` passed; report path is `app/build/reports/lint-results-debug.html`.
 
 ## Manual Regression
 
@@ -40,7 +40,7 @@ Verified on 2026-06-26 with portable JDK 17 and Android SDK under `D:\fp-toolcha
 - Export backup JSON, preview import, and confirm import only adds data.
 - Configure DeepSeek API Key, test connection, generate a plan, edit preview, and save as a new plan.
 - Disable network and confirm manual plans, workout execution, history, and backup still work.
-- Collect internal tester feedback using `docs/phase8-internal-test.md`.
+- Collect internal tester feedback using `docs/beta-feedback-log.md`.
 
 ## Known Limits
 
