@@ -3,6 +3,7 @@ package com.fitplan.app.ui.common
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -169,12 +170,18 @@ fun ConfirmDialog(
         title = { Text(title) },
         text = { Text(message) },
         confirmButton = {
-            Button(onClick = onConfirm) {
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+            ) {
                 Text(confirmText)
             }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) {
+            OutlinedButton(
+                onClick = onDismiss,
+                modifier = Modifier.defaultMinSize(minHeight = 48.dp)
+            ) {
                 Text(dismissText)
             }
         }

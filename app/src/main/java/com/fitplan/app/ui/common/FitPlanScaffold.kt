@@ -7,6 +7,9 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -23,11 +26,15 @@ fun FitPlanScaffold(
         bottomBar = {
             NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 TopLevelDestination.entries.forEach { destination ->
+                    val selected = currentDestination
+                        ?.hierarchy
+                        ?.any { it.route == destination.route } == true
                     NavigationBarItem(
-                        selected = currentDestination
-                            ?.hierarchy
-                            ?.any { it.route == destination.route } == true,
+                        selected = selected,
                         onClick = { onNavigateToTopLevel(destination) },
+                        modifier = Modifier.semantics {
+                            contentDescription = "底部导航：${destination.label}，${if (selected) "当前选中" else "未选中"}"
+                        },
                         icon = {
                             Text(
                                 text = destination.iconLabel,
